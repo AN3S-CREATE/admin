@@ -54,7 +54,14 @@
         },
         "role": {
           "type": "string",
-          "description": "The user's role within the tenant (e.g., admin, user, viewer)."
+          "description": "The user's role within the tenant.",
+          "enum": [
+            "admin",
+            "ops",
+            "hr",
+            "safety",
+            "viewer"
+          ]
         },
         "lastLogin": {
           "type": "string",

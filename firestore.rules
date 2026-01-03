@@ -11,9 +11,9 @@
  * Key Security Decisions:
  * - Strict Tenant Isolation: A user can only access data within the tenant they belong to.
  *   There is no cross-tenant data access.
- * - Role-Based Access: User roles ('admin', 'user', 'viewer') defined in their
- *   user profile (/tenants/{tenantId}/users/{userId}) determine write permissions.
- *   Admins have full control, 'users' can create content, and 'viewers' are read-only.
+ * - Role-Based Access: User roles ('admin', 'ops', 'hr', 'safety', 'viewer') defined
+ *   in their user profile (/tenants/{tenantId}/users/{userId}) determine write permissions.
+ *   Admins have full control, other roles have content creation rights, and 'viewers' are read-only.
  * - Backend Provisioning: Tenant creation and deletion are disallowed from the client
  *   to ensure these are controlled administrative actions.
  * - No Public Enumeration: Listing tenants or all users within a tenant is
@@ -80,11 +80,20 @@ service cloud.firestore {
     }
 
     /**
-     * Validates if the user has write permissions (role is 'admin' or 'user') for the tenant.
+     * Validates if the user has a specific role within the tenant.
+     */
+    function hasRole(tenantId, role) {
+      let userData = getUserData(tenantId);
+      return isSignedIn() && userData != null && userData.data.tenantId == tenantId && userData.data.role == role;
+    }
+    
+    /**
+     * Validates if the user has write permissions for the tenant.
+     * This now includes the more granular roles from the spec.
      */
     function canWriteInTenant(tenantId) {
       let userData = getUserData(tenantId);
-      return isSignedIn() && userData != null && userData.data.tenantId == tenantId && userData.data.role in ['admin', 'user'];
+      return isSignedIn() && userData != null && userData.data.tenantId == tenantId && userData.data.role in ['admin', 'ops', 'hr', 'safety'];
     }
 
     /**
@@ -223,5 +232,3 @@ service cloud.firestore {
 
   }
 }
-
-    
