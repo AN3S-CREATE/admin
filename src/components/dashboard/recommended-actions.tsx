@@ -3,11 +3,22 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "../ui/button"
 import { ThumbsDown, ThumbsUp, Zap } from "lucide-react"
-import { recommendedActionsData } from "@/lib/mock-data"
 import Link from "next/link"
 import { Badge } from "../ui/badge"
 
-export function RecommendedActions() {
+export type SuggestedAction = {
+  action: string;
+  owner: string;
+  impact: string;
+  confidence: number;
+  evidenceLinks: string[];
+}
+
+type RecommendedActionsProps = {
+  actions: SuggestedAction[];
+}
+
+export function RecommendedActions({ actions }: RecommendedActionsProps) {
   return (
     <Card className="glass-card">
       <CardHeader>
@@ -18,7 +29,7 @@ export function RecommendedActions() {
         <CardDescription>AI-suggested actions based on recent operational data.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {recommendedActionsData.map((item, index) => (
+        {actions.map((item, index) => (
           <div key={index} className="flex flex-col sm:flex-row gap-4 justify-between rounded-lg border border-border p-4 transition-colors hover:bg-muted/30">
             <div className="space-y-2">
               <p className="font-semibold">{item.action}</p>
