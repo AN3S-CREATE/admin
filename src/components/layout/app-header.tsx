@@ -18,6 +18,8 @@ import { Fragment, useState } from 'react';
 import { useAuth, useUser } from '@/firebase';
 import { Sheet, SheetContent } from '../ui/sheet';
 import { CopilotPanel } from '../copilot/copilot-panel';
+import { translateNaturalLanguageToQuery } from '@/ai/flows/natural-language-to-query';
+import { useToast } from '@/hooks/use-toast';
 
 export function AppHeader() {
   const router = useRouter();
@@ -25,12 +27,40 @@ export function AppHeader() {
   const auth = useAuth();
   const { user } = useUser();
   const [isCopilotOpen, setIsCopilotOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const { toast } = useToast();
 
   const handleLogout = () => {
     if (auth) {
       auth.signOut();
     }
     router.replace('/login');
+  };
+
+  const handleSearchSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+
+    try {
+      const result = await translateNaturalLanguageToQuery({
+        naturalLanguageQuery: searchQuery,
+      });
+      toast({
+        title: "AI Query Generated",
+        description: (
+          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+            <code className="text-white">{JSON.stringify(result, null, 2)}</code>
+          </pre>
+        ),
+      });
+    } catch (error) {
+      console.error("Error translating query:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Could not translate natural language query.",
+      });
+    }
   };
 
   const pathSegments = pathname.split('/').filter(Boolean);
@@ -59,12 +89,17 @@ export function AppHeader() {
         </div>
 
         <div className="flex-1">
-          <form className="relative ml-auto flex-1 md:grow-0">
+          <form
+            className="relative ml-auto flex-1 md:grow-0"
+            onSubmit={handleSearchSubmit}
+          >
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Natural Language to Insights..."
               className="w-full rounded-lg bg-muted pl-8 md:w-[200px] lg:w-[320px] font-sans"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </form>
         </div>
