@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { HardHat, LayoutDashboard, Truck, Factory, ClipboardList, ShieldAlert, Users, FileText, MapPin, Plug, Settings } from 'lucide-react';
+import { HardHat, LayoutDashboard, Truck, Factory, ClipboardList, ShieldAlert, Users, FileText, MapPin, Plug, Settings, Bell } from 'lucide-react';
 import {
   Sidebar,
   SidebarHeader,
@@ -24,6 +24,7 @@ const navItems = [
   { href: '/dashboard/people', icon: Users, label: 'People' },
   { href: '/dashboard/reports', icon: FileText, label: 'Reports' },
   { href: '/dashboard/tracking', icon: MapPin, label: 'Tracking' },
+  { href: '/dashboard/alerts', icon: Bell, label: 'Alerts' },
   { href: '/dashboard/integrations', icon: Plug, label: 'Integrations' },
 ];
 
