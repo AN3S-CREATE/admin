@@ -2,7 +2,7 @@
 
 import { PageHeader } from '@/components/shared/page-header';
 import { ReportCard } from '@/components/reports/report-card';
-import { FileText, Shield, Activity } from 'lucide-react';
+import { FileText, Shield, Activity, AlertTriangle } from 'lucide-react';
 
 const reports = [
   {
@@ -29,6 +29,12 @@ const reports = [
     href: '#',
     icon: FileText,
   },
+  {
+    title: 'Incidents by Classification',
+    description: 'Review a breakdown of all incidents by their classification.',
+    href: '#',
+    icon: AlertTriangle,
+  }
 ];
 
 export default function ReportsPage() {
