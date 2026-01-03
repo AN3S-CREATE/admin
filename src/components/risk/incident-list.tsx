@@ -1,10 +1,10 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { format, parseISO } from 'date-fns';
 import { Skeleton } from '../ui/skeleton';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 
 export type Incident = {
   id: string;
@@ -40,57 +40,76 @@ export function IncidentList({ incidents, isLoading }: IncidentListProps) {
         <CardDescription>A log of all captured safety and operational incidents.</CardDescription>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Classification</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              Array.from({ length: 3 }).map((_, i) => (
-                <TableRow key={i}>
-                  <TableCell>
-                    <Skeleton className="h-5 w-3/4" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-5 w-20" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-5 w-32" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-6 w-28 rounded-full" />
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : incidents.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
-                  No incidents logged yet.
-                </TableCell>
-              </TableRow>
-            ) : (
-              incidents.map((incident) => (
-                <TableRow key={incident.id} className="cursor-pointer hover:bg-muted/30">
-                  <TableCell className="font-medium max-w-xs truncate">{incident.title}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{incident.classification}</Badge>
-                  </TableCell>
-                  <TableCell>{format(parseISO(incident.date), 'dd MMM yyyy, HH:mm')}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className={statusColors[incident.status]}>
-                      {incident.status}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+        {isLoading ? (
+          <div className="space-y-2">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full" />
+            ))}
+          </div>
+        ) : incidents.length === 0 ? (
+          <div className="flex h-24 items-center justify-center text-muted-foreground">
+            No incidents logged yet.
+          </div>
+        ) : (
+          <Accordion type="single" collapsible className="w-full">
+            {incidents.map((incident) => (
+              <AccordionItem value={incident.id} key={incident.id}>
+                <AccordionTrigger className="hover:no-underline hover:bg-muted/30 px-4 rounded-md">
+                  <div className="flex flex-1 items-center justify-between text-sm">
+                    <span className="font-medium max-w-xs truncate text-left">{incident.title}</span>
+                    <div className="flex items-center gap-4">
+                      <Badge variant="outline">{incident.classification}</Badge>
+                      <span className="hidden md:inline">{format(parseISO(incident.date), 'dd MMM yyyy')}</span>
+                      <Badge variant="outline" className={`${statusColors[incident.status]} w-32 justify-center`}>
+                        {incident.status}
+                      </Badge>
+                    </div>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-4 pt-2 pb-4 text-muted-foreground space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="font-semibold text-foreground mb-1">Reported By</p>
+                      <p>{incident.reportedBy} on {format(parseISO(incident.date), 'dd MMM yyyy, HH:mm')}</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-foreground mb-1">Classification</p>
+                      <p>{incident.classification}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground mb-1">Full Description</p>
+                    <p>{incident.description}</p>
+                  </div>
+                  {incident.timeline && (
+                    <div>
+                      <p className="font-semibold text-foreground mb-1">AI-Generated Timeline</p>
+                      <p className="whitespace-pre-wrap">{incident.timeline}</p>
+                    </div>
+                  )}
+                  {incident.causes && (
+                    <div>
+                      <p className="font-semibold text-foreground mb-1">AI-Generated Causes</p>
+                      <p className="whitespace-pre-wrap">{incident.causes}</p>
+                    </div>
+                  )}
+                  {incident.actions && (
+                    <div>
+                      <p className="font-semibold text-foreground mb-1">AI-Generated Actions</p>
+                      <p className="whitespace-pre-wrap">{incident.actions}</p>
+                    </div>
+                  )}
+                   {incident.capaSuggestions && (
+                    <div>
+                      <p className="font-semibold text-foreground mb-1">AI-Suggested CAPA</p>
+                      <p className="whitespace-pre-wrap">{incident.capaSuggestions}</p>
+                    </div>
+                  )}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        )}
       </CardContent>
     </Card>
   );
