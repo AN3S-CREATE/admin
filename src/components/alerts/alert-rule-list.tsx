@@ -1,17 +1,28 @@
 'use client';
 
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '../ui/skeleton';
 import { Switch } from '../ui/switch';
-import { MoreHorizontal } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
+import { MoreHorizontal, Trash2 } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '../ui/dropdown-menu';
 import { Button } from '../ui/button';
 import { useFirestore } from '@/firebase';
 import { doc } from 'firebase/firestore';
-import { updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { updateDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 
 export type AlertRule = {
@@ -33,6 +44,7 @@ const MOCK_TENANT_ID = 'VeraMine';
 export function AlertRuleList({ alertRules, isLoading }: AlertRuleListProps) {
     const firestore = useFirestore();
     const { toast } = useToast();
+    const [ruleToDelete, setRuleToDelete] = useState<AlertRule | null>(null);
     
     const handleToggleRule = (rule: AlertRule) => {
         if (!firestore) return;
@@ -45,7 +57,19 @@ export function AlertRuleList({ alertRules, isLoading }: AlertRuleListProps) {
         });
     };
 
+    const handleDeleteRule = () => {
+        if (!firestore || !ruleToDelete) return;
+        const ruleDocRef = doc(firestore, 'tenants', MOCK_TENANT_ID, 'alertRules', ruleToDelete.id);
+        deleteDocumentNonBlocking(ruleDocRef);
+        toast({
+            title: 'Rule Deleted',
+            description: `The rule "${ruleToDelete.name}" has been deleted.`,
+        });
+        setRuleToDelete(null);
+    };
+
   return (
+    <>
     <Card className="glass-card">
       <CardHeader>
         <CardTitle>Existing Alert Rules</CardTitle>
@@ -103,7 +127,14 @@ export function AlertRuleList({ alertRules, isLoading }: AlertRuleListProps) {
                             <DropdownMenuContent align="end">
                                 <DropdownMenuItem>Edit Rule</DropdownMenuItem>
                                 <DropdownMenuItem>Test Rule</DropdownMenuItem>
-                                <DropdownMenuItem className="text-destructive">Delete Rule</DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem 
+                                    className="text-destructive"
+                                    onClick={() => setRuleToDelete(rule)}
+                                >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete Rule
+                                </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
@@ -115,5 +146,23 @@ export function AlertRuleList({ alertRules, isLoading }: AlertRuleListProps) {
         </Table>
       </CardContent>
     </Card>
+     <AlertDialog open={!!ruleToDelete} onOpenChange={(open) => !open && setRuleToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the alert rule
+              <span className="font-bold"> "{ruleToDelete?.name}"</span>.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteRule} className="bg-destructive hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
