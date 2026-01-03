@@ -4,6 +4,7 @@ import { PageHeader } from '@/components/shared/page-header';
 import { DowntimeCapture } from '@/components/operations/downtime-capture';
 import { ShiftHandover } from '@/components/operations/shift-handover';
 import { KpiBoard } from '@/components/operations/kpi-board';
+import { ShiftSummaryGenerator } from '@/components/operations/shift-summary-generator';
 
 export default function OperationsPage() {
   return (
@@ -17,8 +18,9 @@ export default function OperationsPage() {
           <ShiftHandover />
           <DowntimeCapture />
         </div>
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 space-y-8">
           <KpiBoard />
+          <ShiftSummaryGenerator />
         </div>
       </div>
     </div>
