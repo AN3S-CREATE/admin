@@ -10,13 +10,10 @@ import { Separator } from '@/components/ui/separator';
 import { HardHat } from 'lucide-react';
 import { useAuth, useUser } from '@/firebase';
 import { initiateEmailSignIn, initiateAnonymousSignIn } from '@/firebase/non-blocking-login';
-import { useToast } from '@/hooks/use-toast';
-import { onAuthStateChanged } from 'firebase/auth';
 
 export function LoginForm() {
   const router = useRouter();
   const auth = useAuth();
-  const { toast } = useToast();
   const [email, setEmail] = useState('demo@veramine.com');
   const [password, setPassword] = useState('password');
   const { user, isUserLoading } = useUser();
@@ -29,11 +26,15 @@ export function LoginForm() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    initiateEmailSignIn(auth, email, password);
+    if (auth) {
+      initiateEmailSignIn(auth, email, password);
+    }
   };
 
   const handleDemoLogin = () => {
-    initiateAnonymousSignIn(auth);
+    if (auth) {
+      initiateAnonymousSignIn(auth);
+    }
   };
 
   return (
