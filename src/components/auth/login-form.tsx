@@ -7,15 +7,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { HardHat } from 'lucide-react';
+import { HardHat, Loader2 } from 'lucide-react';
 import { useAuth, useUser } from '@/firebase';
-import { initiateEmailSignIn, initiateAnonymousSignIn } from '@/firebase/non-blocking-login';
+import { signInWithEmailAndPassword, signInAnonymously } from 'firebase/auth';
+import { useToast } from '@/hooks/use-toast';
 
 export function LoginForm() {
   const router = useRouter();
   const auth = useAuth();
+  const { toast } = useToast();
   const [email, setEmail] = useState('demo@veramine.com');
   const [password, setPassword] = useState('password');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const { user, isUserLoading } = useUser();
 
   useEffect(() => {
@@ -24,18 +27,42 @@ export function LoginForm() {
     }
   }, [user, isUserLoading, router]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (auth) {
-      initiateEmailSignIn(auth, email, password);
+    if (!auth) return;
+
+    setIsLoggingIn(true);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      // The onAuthStateChanged listener in the provider will handle the redirect
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Sign In Failed',
+        description: error.message || 'An unexpected error occurred.',
+      });
+      setIsLoggingIn(false);
     }
   };
 
-  const handleDemoLogin = () => {
-    if (auth) {
-      initiateAnonymousSignIn(auth);
+  const handleDemoLogin = async () => {
+    if (!auth) return;
+
+    setIsLoggingIn(true);
+    try {
+      await signInAnonymously(auth);
+      // The onAuthStateChanged listener will handle the redirect
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Demo Sign In Failed',
+        description: error.message || 'Could not sign in as guest.',
+      });
+      setIsLoggingIn(false);
     }
   };
+
+  const isLoading = isLoggingIn || isUserLoading;
 
   return (
     <Card className="w-full max-w-md glass-card">
@@ -57,6 +84,7 @@ export function LoginForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={isLoading}
             />
           </div>
           <div className="space-y-2">
@@ -67,19 +95,22 @@ export function LoginForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              disabled={isLoading}
             />
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
-          <Button type="submit" className="w-full font-bold">Sign In</Button>
+          <Button type="submit" className="w-full font-bold" disabled={isLoading}>
+            {isLoading ? <Loader2 className="animate-spin" /> : 'Sign In'}
+          </Button>
           <div className="relative w-full">
             <Separator className="absolute left-0 top-1/2 -translate-y-1/2" />
             <p className="text-center text-xs text-muted-foreground bg-card px-2 relative">
               DEMO LOGIN
             </p>
           </div>
-          <Button variant="outline" type="button" className="w-full" onClick={handleDemoLogin}>
-            Continue as Guest
+          <Button variant="outline" type="button" className="w-full" onClick={handleDemoLogin} disabled={isLoading}>
+             {isLoading ? <Loader2 className="animate-spin" /> : 'Continue as Guest'}
           </Button>
         </CardFooter>
       </form>
