@@ -95,7 +95,7 @@ export function UserList({ users, isLoading }: UserListProps) {
                           <DropdownMenuContent align="end">
                               <DropdownMenuItem>Edit User</DropdownMenuItem>
                               {user.status === 'pending' && <DropdownMenuItem>Resend Invitation</DropdownMenuItem>}
-                              {user.status === 'active' ? (
+                              {user.status !== 'disabled' ? (
                                 <DropdownMenuItem 
                                   className="text-destructive" 
                                   onClick={() => handleUpdateUserStatus(user.id, 'disabled')}
