@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -8,17 +9,25 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, UserPlus } from "lucide-react";
+import { useFirestore, useUser } from '@/firebase';
+import { collection, doc } from 'firebase/firestore';
+import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
 const roles = ["admin", "ops", "hr", "safety", "viewer"];
+const MOCK_TENANT_ID = 'VeraMine'; // As defined in use-user.tsx
 
 export function UserInviteForm() {
     const [email, setEmail] = useState('');
     const [role, setRole] = useState('viewer');
     const [isInviting, setIsInviting] = useState(false);
     const { toast } = useToast();
+    const firestore = useFirestore();
+    const { user } = useUser();
 
     const handleInvite = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!firestore || !user) return;
+        
         if (!email) {
             toast({
                 variant: 'destructive',
@@ -29,21 +38,43 @@ export function UserInviteForm() {
         }
 
         setIsInviting(true);
-        // In a real app, you would call a cloud function here to create the user record
-        // and send an invitation email. We'll simulate it with a delay.
-        await new Promise(resolve => setTimeout(resolve, 1500));
 
-        console.log(`Inviting user: ${email} with role: ${role}`);
-        
+        // This is a simplified user creation flow. 
+        // In a real app, you'd likely use a Cloud Function to create the auth user
+        // and send a proper email. For the prototype, we create a placeholder user ID
+        // and set the document in Firestore.
+        const newUserId = `invited_${new Date().getTime()}`;
+        const usersColRef = collection(firestore, 'tenants', MOCK_TENANT_ID, 'users');
+        const newUserDocRef = doc(usersColRef, newUserId);
+
+        const newUser = {
+            id: newUserId,
+            tenantId: MOCK_TENANT_ID,
+            email,
+            role,
+            status: 'pending',
+            invitedAt: new Date().toISOString(),
+            displayName: 'Invited User'
+        };
+
+        // Use the non-blocking update function
+        setDocumentNonBlocking(newUserDocRef, newUser);
+
+        // We don't await the result, but we can give immediate feedback.
         toast({
             title: "Invitation Sent",
-            description: `An invitation has been sent to ${email}.`,
+            description: `An invitation record for ${email} has been created.`,
         });
         
         setEmail('');
         setRole('viewer');
         setIsInviting(false);
     };
+
+    // Only render the component if the user is an admin
+    if (user?.role !== 'admin') {
+        return null;
+    }
 
     return (
         <Card className="glass-card">
