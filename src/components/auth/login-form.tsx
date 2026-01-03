@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { HardHat, Loader2 } from 'lucide-react';
-import { useAuth, useUser } from '@/firebase';
+import { useAuth } from '@/firebase';
+import { useUser } from '@/firebase/auth/use-user';
 import { signInWithEmailAndPassword, signInAnonymously } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
 
@@ -34,7 +35,7 @@ export function LoginForm() {
     setIsLoggingIn(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      // The onAuthStateChanged listener in the provider will handle the redirect
+      // The useUser hook will handle the redirect via the useEffect above
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -51,7 +52,7 @@ export function LoginForm() {
     setIsLoggingIn(true);
     try {
       await signInAnonymously(auth);
-      // The onAuthStateChanged listener will handle the redirect
+      // The useUser hook will handle the redirect
     } catch (error: any) {
       toast({
         variant: 'destructive',

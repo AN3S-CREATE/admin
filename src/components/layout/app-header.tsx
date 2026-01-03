@@ -15,7 +15,8 @@ import { Input } from '@/components/ui/input';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { usePathname, useRouter } from 'next/navigation';
 import { Fragment, useState } from 'react';
-import { useAuth, useUser } from '@/firebase';
+import { useAuth } from '@/firebase';
+import { useUser } from '@/firebase/auth/use-user';
 import { Sheet, SheetContent } from '../ui/sheet';
 import { CopilotPanel } from '../copilot/copilot-panel';
 import { translateNaturalLanguageToQuery } from '@/ai/flows/natural-language-to-query';
@@ -143,7 +144,7 @@ export function AppHeader() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>
-              {user?.isAnonymous ? 'Guest' : user?.email}
+              {user?.displayName ?? user?.email}
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Settings</DropdownMenuItem>

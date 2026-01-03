@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader } from 'lucide-react';
-import { useUser } from '@/firebase';
+import { useUser } from '@/firebase/auth/use-user';
 
 export default function Home() {
   const router = useRouter();
