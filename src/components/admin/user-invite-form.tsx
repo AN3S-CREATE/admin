@@ -12,6 +12,7 @@ import { Loader2, UserPlus } from "lucide-react";
 import { useFirestore, useUser } from '@/firebase';
 import { collection, doc } from 'firebase/firestore';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import type { User } from '@/types/user';
 
 const roles = ["admin", "ops", "hr", "safety", "viewer"];
 const MOCK_TENANT_ID = 'VeraMine'; // As defined in use-user.tsx
@@ -47,7 +48,7 @@ export function UserInviteForm() {
         const usersColRef = collection(firestore, 'tenants', MOCK_TENANT_ID, 'users');
         const newUserDocRef = doc(usersColRef, newUserId);
 
-        const newUser = {
+        const newUser: Omit<User, 'id'> & { id: string; invitedAt: string; tenantId: string } = {
             id: newUserId,
             tenantId: MOCK_TENANT_ID,
             email,
