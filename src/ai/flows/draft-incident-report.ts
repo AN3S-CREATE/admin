@@ -47,7 +47,7 @@ const prompt = ai.definePrompt({
   - Actions: Describe the immediate actions taken in response to the incident.
   - CAPA Suggestions: Provide Corrective and Preventative Actions (CAPA) suggestions to prevent future occurrences.
 
-  Format the output in a structured and readable manner.
+  Format the output as a JSON object with the specified keys.
   `,
 });
 

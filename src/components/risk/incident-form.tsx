@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Wand2, Loader2, Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { draftIncidentReport } from '@/ai/flows/draft-incident-report';
+import { draftIncidentReport, type DraftIncidentReportOutput } from '@/ai/flows/draft-incident-report';
 import { useFirestore } from '@/firebase';
 import { collection } from 'firebase/firestore';
 import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
@@ -23,6 +23,9 @@ export function IncidentForm() {
   );
   const [classification, setClassification] = useState('Near Miss');
   const [reportedBy, setReportedBy] = useState('Demo User');
+
+  // State for AI-generated fields
+  const [aiDraft, setAiDraft] = useState<Omit<DraftIncidentReportOutput, 'classification'> | null>(null);
 
   const [isDrafting, setIsDrafting] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,15 +43,16 @@ export function IncidentForm() {
     }
 
     setIsDrafting(true);
+    setAiDraft(null);
     try {
-      const result = await draftIncidentReport({
+      const { classification: aiClassification, ...rest } = await draftIncidentReport({
         freeText: description,
         selectedEvents: ['EVT-123', 'EVT-456'], // Mock event IDs
       });
 
       // Populate form fields with AI suggestions
-      setClassification(result.classification);
-      // In a real app, we might do more with the other fields (timeline, causes, etc.)
+      setClassification(aiClassification);
+      setAiDraft(rest);
       
       toast({
         title: 'AI Draft Generated',
@@ -84,7 +88,11 @@ export function IncidentForm() {
         date: new Date().toISOString(),
         status: 'Under Investigation',
         classification,
-        reportedBy
+        reportedBy,
+        timeline: aiDraft?.timeline || '',
+        causes: aiDraft?.causes || '',
+        actions: aiDraft?.actions || '',
+        capaSuggestions: aiDraft?.capaSuggestions || '',
     };
 
     addDocumentNonBlocking(incidentsColRef, newIncident);
@@ -100,6 +108,7 @@ export function IncidentForm() {
     setDescription('');
     setClassification('');
     setReportedBy('Demo User');
+    setAiDraft(null);
     setIsSubmitting(false);
   }
 
