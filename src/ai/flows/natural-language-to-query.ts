@@ -54,4 +54,18 @@ Respond with a queryConfiguration that represents a saved query/report configura
 
 Example:
 User Query: Show downtime by reason code last 7 days for Site A
-queryConfiguration: { \
+queryConfiguration: { \`report: 'downtime', dimensions: ['reasonCode'], filters: [{field: 'site', value: 'Site A'}, {field: 'timeRange', value: '7d'}]\` }
+confirmationPrompt: "I'm about to generate a report showing downtime by reason code for 'Site A' over the last 7 days. Does that look correct?"`,
+});
+
+const translateNaturalLanguageToQueryFlow = ai.defineFlow(
+  {
+    name: 'translateNaturalLanguageToQueryFlow',
+    inputSchema: TranslateNaturalLanguageToQueryInputSchema,
+    outputSchema: TranslateNaturalLanguageToQueryOutputSchema,
+  },
+  async input => {
+    const {output} = await translateNaturalLanguageToQueryPrompt(input);
+    return output!;
+  }
+);
