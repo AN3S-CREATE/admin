@@ -29,35 +29,38 @@ export default function DashboardPage() {
         <DateRangePicker />
       </PageHeader>
       
-      <motion.div 
-        className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {statCards.map((card) => (
-          <StatCard
-            key={card.title}
-            title={card.title}
-            value={card.value}
-            icon={card.icon}
-            trend={card.trend}
-            trendValue={card.trendValue}
-            period={card.period}
-          />
-        ))}
-      </motion.div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Left Column: KPI Cards */}
+        <motion.div 
+          className="lg:col-span-3 space-y-4"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {statCards.map((card) => (
+            <StatCard
+              key={card.title}
+              title={card.title}
+              value={card.value}
+              icon={card.icon}
+              trend={card.trend}
+              trendValue={card.trendValue}
+              period={card.period}
+            />
+          ))}
+        </motion.div>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-2">
+        {/* Center Column: Main Charts */}
+        <div className="lg:col-span-6 space-y-8">
           <ProductionChart />
-        </div>
-        <div className="lg:col-span-1">
           <DowntimeChart />
         </div>
+
+        {/* Right Column: Actions */}
+        <div className="lg:col-span-3">
+          <RecommendedActions actions={recommendedActionsData} />
+        </div>
       </div>
-      
-      <RecommendedActions actions={recommendedActionsData} />
     </div>
   );
 }

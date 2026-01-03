@@ -40,7 +40,7 @@ export function StatCard({
           <Icon className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold font-sans">{value}</div>
+          <div className="text-3xl font-bold font-sans text-primary">{value}</div>
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <p className={cn("flex items-center gap-0.5 font-semibold", trendColor)}>
               <TrendIcon className="h-3 w-3" />

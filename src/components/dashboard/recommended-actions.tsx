@@ -20,7 +20,7 @@ type RecommendedActionsProps = {
 
 export function RecommendedActions({ actions }: RecommendedActionsProps) {
   return (
-    <Card className="glass-card">
+    <Card className="glass-card h-full">
       <CardHeader>
         <div className="flex items-center gap-2">
             <Zap className="h-6 w-6 text-primary"/>
@@ -28,12 +28,12 @@ export function RecommendedActions({ actions }: RecommendedActionsProps) {
         </div>
         <CardDescription>AI-suggested actions based on recent operational data.</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4">
         {actions.map((item, index) => (
-          <div key={index} className="flex flex-col sm:flex-row gap-4 justify-between rounded-lg border border-border p-4 transition-colors hover:bg-muted/30">
+          <div key={index} className="flex flex-col gap-4 rounded-lg border border-border p-3 transition-colors hover:bg-muted/30">
             <div className="space-y-2">
-              <p className="font-semibold">{item.action}</p>
-              <div className="text-sm text-muted-foreground space-y-1">
+              <p className="font-semibold text-sm">{item.action}</p>
+              <div className="text-xs text-muted-foreground space-y-1">
                 <p><span className="font-medium text-foreground">Owner:</span> {item.owner}</p>
                 <p><span className="font-medium text-foreground">Impact:</span> {item.impact}</p>
                 <div className="flex items-center flex-wrap gap-x-2 gap-y-1">
@@ -46,15 +46,15 @@ export function RecommendedActions({ actions }: RecommendedActionsProps) {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col items-center justify-center gap-2 shrink-0">
-                <Badge variant="outline" className="border-primary/50 text-primary">
+            <div className="flex items-center justify-between gap-2 shrink-0">
+                <Badge variant="outline" className="border-primary/50 text-primary text-xs">
                     Confidence: {(item.confidence * 100).toFixed(0)}%
                 </Badge>
-                <div className="flex items-center gap-2 mt-2">
-                    <Button variant="outline" size="icon" className="h-8 w-8 border-green-500/50 text-green-500 hover:bg-green-500/10 hover:text-green-400">
+                <div className="flex items-center gap-2">
+                    <Button variant="outline" size="icon" className="h-7 w-7 border-green-500/50 text-green-500 hover:bg-green-500/10 hover:text-green-400">
                         <ThumbsUp className="h-4 w-4" />
                     </Button>
-                    <Button variant="outline" size="icon" className="h-8 w-8 border-red-500/50 text-red-500 hover:bg-red-500/10 hover:text-red-400">
+                    <Button variant="outline" size="icon" className="h-7 w-7 border-red-500/50 text-red-500 hover:bg-red-500/10 hover:text-red-400">
                         <ThumbsDown className="h-4 w-4" />
                     </Button>
                 </div>
