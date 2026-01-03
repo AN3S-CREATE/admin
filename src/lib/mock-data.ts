@@ -14,11 +14,11 @@ export const productionData = [
 ];
 
 export const downtimeData = [
-  { reason: 'Mechanical', hours: 120, fill: "var(--color-mechanical)" },
-  { reason: 'Electrical', hours: 85, fill: "var(--color-electrical)" },
-  { reason: 'Operational', hours: 60, fill: "var(--color-operational)" },
-  { reason: 'Weather', hours: 30, fill: "var(--color-weather)" },
-  { reason: 'Scheduled', hours: 150, fill: "var(--color-scheduled)" },
+  { reason: 'Mechanical', hours: 120 },
+  { reason: 'Electrical', hours: 85 },
+  { reason: 'Operational', hours: 60 },
+  { reason: 'Weather', hours: 30 },
+  { reason: 'Scheduled', hours: 150 },
 ];
 
 export const recommendedActionsData = [

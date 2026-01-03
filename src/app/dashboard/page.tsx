@@ -15,9 +15,9 @@ import {
   Zap,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { suggestActions } from '@/ai/flows/suggest-actions';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { recommendedActionsData } from '@/lib/mock-data';
 
 const statCards = [
   {
@@ -65,31 +65,11 @@ const containerVariants = {
 };
 
 export default function DashboardPage() {
-  const [recommendedActions, setRecommendedActions] = useState<SuggestedAction[]>([]);
-  const [isLoadingActions, setIsLoadingActions] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const getRecommendations = async () => {
-      setIsLoadingActions(true);
-      try {
-        const result = await suggestActions({
-          siteDescription: "A large open-pit iron ore mine in Western Australia. Currently running at 95% capacity.",
-          recentEvents: "Recent events include two unplanned downtime incidents on conveyor C-03, a near-miss safety incident involving haul truck #12, and consistently high fuel consumption readings from the haul fleet.",
-          operationalGoals: "Primary goal is to increase production by 5% quarter-over-quarter while maintaining a Total Recordable Injury Frequency Rate (TRIFR) below 0.5."
-        });
-        if (result.suggestedActions) {
-          setRecommendedActions(result.suggestedActions);
-        }
-      } catch (error) {
-        console.error("Error fetching AI recommendations:", error);
-        // Optionally, set some default or error state actions
-        setRecommendedActions([]);
-      } finally {
-        setIsLoadingActions(false);
-      }
-    };
-
-    getRecommendations();
+    const timer = setTimeout(() => setIsLoading(false), 1500); // Simulate initial page load
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -129,7 +109,7 @@ export default function DashboardPage() {
         </div>
       </div>
       
-      {isLoadingActions ? (
+      {isLoading ? (
         <Card className="glass-card">
           <CardHeader>
             <div className="flex items-center gap-2">
@@ -145,7 +125,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       ) : (
-        <RecommendedActions actions={recommendedActions} />
+        <RecommendedActions actions={recommendedActionsData} />
       )}
     </div>
   );

@@ -67,7 +67,7 @@ export function DowntimeChart() {
                 strokeWidth={5}
               >
                 {downtimeData.map((entry) => (
-                  <Cell key={`cell-${entry.reason}`} fill={entry.fill} />
+                  <Cell key={`cell-${entry.reason}`} fill={chartConfig[entry.reason.toLowerCase() as keyof typeof chartConfig]?.color || '#ccc'} />
                 ))}
               </Pie>
             </PieChart>
