@@ -10,7 +10,7 @@ export default function IntegrationsPage() {
       />
       <Card className="glass-card">
         <CardContent className="pt-6">
-          <p className="text-muted-foreground">The data integration module will be available here. This section will allow you to manage data connectors, configure event mappings, and monitor ingestion logs.</p>
+          <p className="text-muted-foreground">The data integration module will be available here. This section will allow you to manage data connectors in a registry, configure event mappings, and monitor ingestion logs.</p>
         </CardContent>
       </Card>
     </div>

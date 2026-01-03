@@ -10,7 +10,7 @@ export default function TransportPage() {
       />
       <Card className="glass-card">
         <CardContent className="pt-6">
-          <p className="text-muted-foreground">The transport and logistics module will be available here. This will provide a fleet overview, manage the lifecycle of trips, and flag any exceptions or delays.</p>
+          <p className="text-muted-foreground">The transport and logistics module will be available here. This will provide a fleet overview, manage the lifecycle of trips (create, assign, complete), and flag any exceptions or delays.</p>
         </CardContent>
       </Card>
     </div>

@@ -10,7 +10,7 @@ export default function OperationsPage() {
       />
       <Card className="glass-card">
         <CardContent className="pt-6">
-          <p className="text-muted-foreground">The operations management module will be available here. This includes tools for shift handovers, logging downtime events, and viewing automated shift summaries.</p>
+          <p className="text-muted-foreground">The operations management module will be available here. This includes tools for shift handovers, logging downtime events with reason codes, and viewing an operational KPI board.</p>
         </CardContent>
       </Card>
     </div>
