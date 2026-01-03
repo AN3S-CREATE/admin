@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { MoreHorizontal, Truck } from 'lucide-react';
+import { MoreHorizontal, Truck, Shovel, Construction } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { Button } from '../ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
@@ -22,9 +22,9 @@ const statusColors: Record<Vehicle['status'], string> = {
 
 const vehicleTypeIcons: Record<Vehicle['type'], React.ElementType> = {
     'Haul Truck': Truck,
-    'Light Vehicle': Truck,
-    'Excavator': Truck,
-    'Dozer': Truck,
+    'Light Vehicle': Truck, // Could use a car icon if available
+    'Excavator': Shovel,
+    'Dozer': Construction,
 };
 
 export function FleetOverview({ vehicles }: FleetOverviewProps) {
