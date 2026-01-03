@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { MoreHorizontal, Users } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
+import { Skeleton } from "../ui/skeleton";
 
 export type User = {
   id: string;
@@ -17,6 +18,7 @@ export type User = {
 
 type UserListProps = {
   users: User[];
+  isLoading: boolean;
 };
 
 const statusColors: Record<User['status'], string> = {
@@ -25,7 +27,7 @@ const statusColors: Record<User['status'], string> = {
     'disabled': 'bg-red-500/20 text-red-500 border-red-500/30'
 }
 
-export function UserList({ users }: UserListProps) {
+export function UserList({ users, isLoading }: UserListProps) {
   return (
     <Card className="glass-card">
       <CardHeader>
@@ -47,34 +49,46 @@ export function UserList({ users }: UserListProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.id} className="hover:bg-muted/30">
-                <TableCell className="font-medium">{user.displayName || '-'}</TableCell>
-                <TableCell className="text-muted-foreground">{user.email}</TableCell>
-                <TableCell>
-                  <Badge variant="outline" className="capitalize border-primary/40">{user.role}</Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={`${statusColors[user.status]} capitalize`}>
-                    {user.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                                <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem>Edit User</DropdownMenuItem>
-                            <DropdownMenuItem>Resend Invitation</DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive">Disable User</DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-40" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-16" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                  <TableCell><Skeleton className="h-8 w-8" /></TableCell>
+                </TableRow>
+              ))
+            ) : (
+              users.map((user) => (
+                <TableRow key={user.id} className="hover:bg-muted/30">
+                  <TableCell className="font-medium">{user.displayName || '-'}</TableCell>
+                  <TableCell className="text-muted-foreground">{user.email}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="capitalize border-primary/40">{user.role}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className={`${statusColors[user.status]} capitalize`}>
+                      {user.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                      <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                                  <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                              <DropdownMenuItem>Edit User</DropdownMenuItem>
+                              <DropdownMenuItem>Resend Invitation</DropdownMenuItem>
+                              <DropdownMenuItem className="text-destructive">Disable User</DropdownMenuItem>
+                          </DropdownMenuContent>
+                      </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </CardContent>
