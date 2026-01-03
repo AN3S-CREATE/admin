@@ -20,6 +20,7 @@ import { Sheet, SheetContent } from '../ui/sheet';
 import { CopilotPanel } from '../copilot/copilot-panel';
 import { translateNaturalLanguageToQuery } from '@/ai/flows/natural-language-to-query';
 import { useToast } from '@/hooks/use-toast';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export function AppHeader() {
   const router = useRouter();
@@ -29,6 +30,8 @@ export function AppHeader() {
   const [isCopilotOpen, setIsCopilotOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const { toast } = useToast();
+
+  const userAvatar = PlaceHolderImages.find(p => p.id === 'user-avatar');
 
   const handleLogout = () => {
     if (auth) {
@@ -128,9 +131,9 @@ export function AppHeader() {
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
               <Avatar className="h-8 w-8">
                 <AvatarImage
-                  src={user?.photoURL ?? 'https://picsum.photos/seed/10/40/40'}
+                  src={userAvatar?.imageUrl ?? 'https://picsum.photos/seed/10/40/40'}
                   alt="User Avatar"
-                  data-ai-hint="person face"
+                  data-ai-hint={userAvatar?.imageHint}
                 />
                 <AvatarFallback>
                   {user?.email?.charAt(0).toUpperCase() ?? 'G'}
