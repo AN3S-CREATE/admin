@@ -1,22 +1,18 @@
 "use client";
 
-import { useState, useEffect } from 'react';
 import { PageHeader } from "@/components/shared/page-header";
 import { DateRangePicker } from "@/components/shared/date-range-picker";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { ProductionChart } from "@/components/dashboard/production-chart";
 import { DowntimeChart } from "@/components/dashboard/downtime-chart";
-import { RecommendedActions, type SuggestedAction } from "@/components/dashboard/recommended-actions";
+import { RecommendedActions } from "@/components/dashboard/recommended-actions";
 import {
   Activity,
   ArrowUp,
   Truck,
   AlertTriangle,
-  Zap,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { Skeleton } from '@/components/ui/skeleton';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { recommendedActionsData } from '@/lib/mock-data';
 
 const statCards = [
@@ -65,13 +61,6 @@ const containerVariants = {
 };
 
 export default function DashboardPage() {
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1500); // Simulate initial page load
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
     <div className="space-y-8">
       <PageHeader
@@ -109,24 +98,7 @@ export default function DashboardPage() {
         </div>
       </div>
       
-      {isLoading ? (
-        <Card className="glass-card">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-                <Zap className="h-6 w-6 text-primary"/>
-                <CardTitle className="font-headline">Recommended Actions</CardTitle>
-            </div>
-            <CardDescription>AI-suggested actions based on recent operational data.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Skeleton className="h-24 w-full" />
-            <Skeleton className="h-24 w-full" />
-            <Skeleton className="h-24 w-full" />
-          </CardContent>
-        </Card>
-      ) : (
-        <RecommendedActions actions={recommendedActionsData} />
-      )}
+      <RecommendedActions actions={recommendedActionsData} />
     </div>
   );
 }
