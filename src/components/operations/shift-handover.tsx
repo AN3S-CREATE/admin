@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ClipboardPaste } from 'lucide-react';
+import { Label } from '../ui/label';
 
 export function ShiftHandover() {
     return (
@@ -18,10 +19,14 @@ export function ShiftHandover() {
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                <Textarea 
-                    placeholder="Enter notes here... e.g., 'Haul truck #5 is due for refueling. Watch for weather changes from the west.'"
-                    className="min-h-[120px]"
-                />
+                 <div className='space-y-2'>
+                    <Label htmlFor='handover-notes'>Handover Notes</Label>
+                    <Textarea 
+                        id='handover-notes'
+                        placeholder="Enter notes here... e.g., 'Haul truck #5 is due for refueling. Watch for weather changes from the west.'"
+                        className="min-h-[120px]"
+                    />
+                </div>
                 <Button className="w-full">Submit Handover</Button>
             </CardContent>
         </Card>

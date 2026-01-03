@@ -20,19 +20,25 @@ export function DowntimeCapture() {
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div className='space-y-2'>
-                    <Label htmlFor='downtime-asset'>Asset ID</Label>
-                    <Input id='downtime-asset' placeholder='e.g., Crusher-01, HT-004' />
+                <div className='grid grid-cols-2 gap-4'>
+                    <div className='space-y-2'>
+                        <Label htmlFor='downtime-asset'>Asset ID</Label>
+                        <Input id='downtime-asset' placeholder='e.g., Crusher-01' />
+                    </div>
+                    <div className='space-y-2'>
+                        <Label htmlFor='downtime-duration'>Duration (mins)</Label>
+                        <Input id='downtime-duration' type='number' placeholder='e.g., 45' />
+                    </div>
                 </div>
                  <div className='space-y-2'>
                     <Label htmlFor='downtime-reason'>Reason Code</Label>
-                    <Input id='downtime-reason' placeholder='e.g., Mechanical, Electrical' />
+                    <Input id='downtime-reason' placeholder='e.g., Unscheduled Maintenance' />
                 </div>
                 <div className='space-y-2'>
                     <Label htmlFor='downtime-notes'>Notes</Label>
                     <Textarea 
                         id='downtime-notes'
-                        placeholder="Add optional notes..."
+                        placeholder="Add optional notes about the cause..."
                         className="min-h-[80px]"
                     />
                 </div>
