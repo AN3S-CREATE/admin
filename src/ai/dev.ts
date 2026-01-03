@@ -8,3 +8,4 @@ import '@/ai/flows/draft-incident-report.ts';
 import '@/ai/flows/generate-report-narrative.ts';
 import '@/ai/flows/suggest-actions.ts';
 import '@/ai/flows/ops-copilot-flow.ts';
+import '@/ai/flows/generate-alert-rule.ts';
