@@ -6,9 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ClipboardPaste, Loader2 } from 'lucide-react';
 import { Label } from '../ui/label';
-import { useFirestore } from '@/firebase';
-import { collection } from 'firebase/firestore';
-import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { useFirestore, useUser } from '@/firebase';
+import { collection, doc } from 'firebase/firestore';
+import { addDocumentNonBlocking, setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { useToast } from '@/hooks/use-toast';
 
 const MOCK_TENANT_ID = 'VeraMine';
@@ -18,12 +18,13 @@ export function ShiftHandover() {
     const [notes, setNotes] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const firestore = useFirestore();
+    const { user } = useUser();
     const { toast } = useToast();
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!firestore) {
-            toast({ variant: 'destructive', title: 'Error', description: 'Firestore is not available.' });
+        if (!firestore || !user) {
+            toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in to perform this action.' });
             return;
         }
 
@@ -34,18 +35,32 @@ export function ShiftHandover() {
 
         setIsSubmitting(true);
 
+        // Also log this as a generic event
+        const eventsColRef = collection(firestore, 'tenants', MOCK_TENANT_ID, 'events');
+        const newEvent = {
+            tenantId: MOCK_TENANT_ID,
+            timestamp: new Date().toISOString(),
+            eventType: 'handover',
+            actor: user.displayName || user.email,
+            payload: {
+                siteId: MOCK_SITE_ID,
+                summary: notes.substring(0, 100) + (notes.length > 100 ? '...' : ''),
+            }
+        };
+        addDocumentNonBlocking(eventsColRef, newEvent);
+
+        // Save the full summary
         const summariesColRef = collection(firestore, 'tenants', MOCK_TENANT_ID, 'shiftSummaries');
-        
         const newSummary = {
             tenantId: MOCK_TENANT_ID,
             siteId: MOCK_SITE_ID,
             summary: notes,
             startTime: new Date().toISOString(),
-            endTime: new Date().toISOString(), // Placeholder for a real shift end time
+            endTime: new Date().toISOString(), // Placeholder
             sources: ['manual_handover_note'],
         };
-
         addDocumentNonBlocking(summariesColRef, newSummary);
+
 
         toast({
             title: 'Handover Notes Submitted',

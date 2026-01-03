@@ -8,6 +8,7 @@ import { DowntimeChart } from "@/components/dashboard/downtime-chart";
 import { RecommendedActions } from "@/components/dashboard/recommended-actions";
 import { motion } from "framer-motion";
 import { recommendedActionsData, statCards } from '@/lib/mock-data';
+import { EventLog } from "@/components/dashboard/event-log";
 
 const containerVariants = {
   hidden: { opacity: 1 },
@@ -61,6 +62,7 @@ export default function DashboardPage() {
           <RecommendedActions actions={recommendedActionsData} />
         </div>
       </div>
+      <EventLog />
     </div>
   );
 }

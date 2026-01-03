@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Loader2, TimerOff } from 'lucide-react';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
-import { useFirestore } from '@/firebase';
+import { useFirestore, useUser } from '@/firebase';
 import { collection } from 'firebase/firestore';
 import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { useToast } from '@/hooks/use-toast';
@@ -22,15 +22,16 @@ export function DowntimeCapture() {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const firestore = useFirestore();
+    const { user } = useUser();
     const { toast } = useToast();
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!firestore) {
+        if (!firestore || !user) {
             toast({
                 variant: 'destructive',
                 title: 'Error',
-                description: 'Firestore is not available.',
+                description: 'You must be logged in to perform this action.',
             });
             return;
         }
@@ -52,6 +53,7 @@ export function DowntimeCapture() {
             tenantId: MOCK_TENANT_ID,
             timestamp: new Date().toISOString(),
             eventType: 'downtime',
+            actor: user.displayName || user.email,
             payload: {
                 assetId,
                 duration: parseInt(duration, 10),

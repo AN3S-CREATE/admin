@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Wand2, Loader2, Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { draftIncidentReport, type DraftIncidentReportOutput } from '@/ai/flows/draft-incident-report';
-import { useFirestore } from '@/firebase';
+import { useFirestore, useUser } from '@/firebase';
 import { collection } from 'firebase/firestore';
 import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import type { Incident } from './incident-list';
@@ -31,6 +31,7 @@ export function IncidentForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const firestore = useFirestore();
+  const { user } = useUser();
 
   const handleDraftReport = async () => {
     if (!description.trim()) {
@@ -73,12 +74,26 @@ export function IncidentForm() {
 
   const handleManualSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!firestore || !title || !description || !classification) {
+    if (!firestore || !user || !title || !description || !classification) {
         toast({ variant: "destructive", title: "Missing Fields", description: "Please fill out all required fields."});
         return;
     }
 
     setIsSubmitting(true);
+    
+    // Also log this as a generic event
+    const eventsColRef = collection(firestore, 'tenants', MOCK_TENANT_ID, 'events');
+    const newEvent = {
+        tenantId: MOCK_TENANT_ID,
+        timestamp: new Date().toISOString(),
+        eventType: 'incident',
+        actor: user.displayName || user.email,
+        payload: {
+            title,
+            classification,
+        }
+    };
+    addDocumentNonBlocking(eventsColRef, newEvent);
 
     const incidentsColRef = collection(firestore, 'tenants', MOCK_TENANT_ID, 'incidents');
     const newIncident: Omit<Incident, 'id'> = {

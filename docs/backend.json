@@ -144,6 +144,10 @@
           "type": "string",
           "description": "Type of the event (e.g., alarm, downtime, telemetry)."
         },
+        "actor": {
+          "type": "string",
+          "description": "The user or system that generated the event."
+        },
         "payload": {
           "type": "object",
           "description": "Object containing the event payload."
@@ -154,7 +158,8 @@
         "tenantId",
         "timestamp",
         "eventType",
-        "payload"
+        "payload",
+        "actor"
       ]
     },
     "AiRecommendation": {
