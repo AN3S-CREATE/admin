@@ -41,8 +41,8 @@ export function ProductionChart() {
               tickFormatter={(value) => `${value / 1000}k`}
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <Bar dataKey="coal" fill="var(--color-coal)" radius={4} />
-            <Bar dataKey="iron" fill="var(--color-iron)" radius={4} />
+            <Bar dataKey="coal" radius={4} />
+            <Bar dataKey="iron" radius={4} />
           </BarChart>
         </ChartContainer>
       </CardContent>
