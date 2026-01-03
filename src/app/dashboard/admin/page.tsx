@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { PageHeader } from '@/components/shared/page-header';
 import { UserInviteForm } from '@/components/admin/user-invite-form';
 import { UserList } from '@/components/admin/user-list';
-import { useCollection, useFirestore, useUser } from '@/firebase';
+import { useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
 
 const MOCK_TENANT_ID = 'VeraMine'; // As defined in use-user.tsx
@@ -13,13 +13,11 @@ export default function AdminPage() {
   const firestore = useFirestore();
   const { user: currentUser } = useUser();
 
-  const usersColRef = useMemo(() => {
+  const usersColRef = useMemoFirebase(() => {
     if (!firestore || !currentUser) return null;
     // Only admins should be able to fetch the user list
     if (currentUser.role !== 'admin') return null;
     return collection(firestore, 'tenants', MOCK_TENANT_ID, 'users');
-  // The hook requires this to be memoized
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firestore, currentUser]);
 
   const { data: users, isLoading } = useCollection(usersColRef);
