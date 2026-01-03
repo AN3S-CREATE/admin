@@ -382,7 +382,7 @@
         "definition": {
           "entityName": "Tenant",
           "schema": {
-            "$ref": "#/backend/entities/Tenant"
+            "$ref": "#/entities/Tenant"
           },
           "description": "Stores tenant-level information.",
           "params": [
@@ -398,7 +398,7 @@
         "definition": {
           "entityName": "User",
           "schema": {
-            "$ref": "#/backend/entities/User"
+            "$ref": "#/entities/User"
           },
           "description": "Stores user information, including their role within the tenant. Includes denormalized 'tenantId' for authorization independence.",
           "params": [
@@ -418,7 +418,7 @@
         "definition": {
           "entityName": "SiteConfiguration",
           "schema": {
-            "$ref": "#/backend/entities/SiteConfiguration"
+            "$ref": "#/entities/SiteConfiguration"
           },
           "description": "Stores site-specific configurations. Includes denormalized 'tenantId' for authorization independence.",
           "params": [
@@ -438,7 +438,7 @@
         "definition": {
           "entityName": "Event",
           "schema": {
-            "$ref": "#/backend/entities/Event"
+            "$ref": "#/entities/Event"
           },
           "description": "Stores ingested events. Includes denormalized 'tenantId' for authorization independence.",
           "params": [
@@ -458,7 +458,7 @@
         "definition": {
           "entityName": "AiRecommendation",
           "schema": {
-            "$ref": "#/backend/entities/AiRecommendation"
+            "$ref": "#/entities/AiRecommendation"
           },
           "description": "Stores AI-suggested actions. Includes denormalized 'tenantId' for authorization independence.",
           "params": [
@@ -478,7 +478,7 @@
         "definition": {
           "entityName": "ShiftSummary",
           "schema": {
-            "$ref": "#/backend/entities/ShiftSummary"
+            "$ref": "#/entities/ShiftSummary"
           },
           "description": "Stores shift summaries. Includes denormalized 'tenantId' for authorization independence.",
           "params": [
@@ -498,7 +498,7 @@
         "definition": {
           "entityName": "Incident",
           "schema": {
-            "$ref": "#/backend/entities/Incident"
+            "$ref": "#/entities/Incident"
           },
           "description": "Stores incident data. Includes denormalized 'tenantId' for authorization independence.",
           "params": [
@@ -518,7 +518,7 @@
         "definition": {
           "entityName": "AlertRule",
           "schema": {
-            "$ref": "#/backend/entities/AlertRule"
+            "$ref": "#/entities/AlertRule"
           },
           "description": "Stores alert rule configurations. Includes denormalized 'tenantId' for authorization independence.",
           "params": [
