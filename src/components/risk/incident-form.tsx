@@ -1,30 +1,44 @@
-"use client";
+'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Wand2, Loader2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Wand2, Loader2, Send } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import { draftIncidentReport } from '@/ai/flows/draft-incident-report';
+import { useFirestore } from '@/firebase';
+import { collection } from 'firebase/firestore';
+import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import type { Incident } from './incident-list';
+
+const MOCK_TENANT_ID = 'VeraMine'; // As defined in use-user.tsx
 
 export function IncidentForm() {
-  const [description, setDescription] = useState('Haul truck #7 nearly collided with a light vehicle at the intersection of Haul Road A and B. The LV failed to yield. No injuries, minor vehicle damage.');
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState(
+    'Haul truck #7 nearly collided with a light vehicle at the intersection of Haul Road A and B. The LV failed to yield. No injuries, minor vehicle damage.'
+  );
+  const [classification, setClassification] = useState('Near Miss');
+  const [reportedBy, setReportedBy] = useState('Demo User');
+
   const [isDrafting, setIsDrafting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const firestore = useFirestore();
 
   const handleDraftReport = async () => {
     if (!description.trim()) {
       toast({
-        variant: "destructive",
-        title: "Description is empty",
-        description: "Please provide a description of the incident.",
+        variant: 'destructive',
+        title: 'Description is empty',
+        description: 'Please provide a description of the incident.',
       });
       return;
     }
-    
+
     setIsDrafting(true);
     try {
       const result = await draftIncidentReport({
@@ -32,41 +46,74 @@ export function IncidentForm() {
         selectedEvents: ['EVT-123', 'EVT-456'], // Mock event IDs
       });
 
+      // Populate form fields with AI suggestions
+      setClassification(result.classification);
+      // In a real app, we might do more with the other fields (timeline, causes, etc.)
+      
       toast({
-        title: "AI Draft Generated",
-        description: (
-          <div className="w-full mt-2">
-            <h4 className="font-bold">Incident Draft</h4>
-            <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-              <code className="text-white">{JSON.stringify(result, null, 2)}</code>
-            </pre>
-          </div>
-        ),
+        title: 'AI Draft Generated',
+        description: 'Review the auto-filled fields and submit the report.',
       });
+
     } catch (error) {
-      console.error("Error drafting incident report:", error);
+      console.error('Error drafting incident report:', error);
       toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Could not generate AI draft.",
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Could not generate AI draft.',
       });
     } finally {
       setIsDrafting(false);
     }
   };
 
+  const handleManualSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!firestore || !title || !description || !classification) {
+        toast({ variant: "destructive", title: "Missing Fields", description: "Please fill out all required fields."});
+        return;
+    }
+
+    setIsSubmitting(true);
+
+    const incidentsColRef = collection(firestore, 'tenants', MOCK_TENANT_ID, 'incidents');
+    const newIncident: Omit<Incident, 'id'> = {
+        tenantId: MOCK_TENANT_ID,
+        title,
+        description,
+        date: new Date().toISOString(),
+        status: 'Under Investigation',
+        classification,
+        reportedBy
+    };
+
+    addDocumentNonBlocking(incidentsColRef, newIncident);
+
+    // Immediate feedback, not waiting for promise
+    toast({
+        title: "Incident Logged",
+        description: `${title} has been submitted for investigation.`
+    });
+
+    // Reset form
+    setTitle('');
+    setDescription('');
+    setClassification('');
+    setReportedBy('Demo User');
+    setIsSubmitting(false);
+  }
+
   return (
     <Card className="glass-card">
       <CardHeader>
         <CardTitle>Log New Incident</CardTitle>
-        <CardDescription>
-          Capture the details of a new incident or near-miss.
-        </CardDescription>
+        <CardDescription>Capture the details of a new incident or near-miss.</CardDescription>
       </CardHeader>
+      <form onSubmit={handleManualSubmit}>
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="title">Title</Label>
-          <Input id="title" placeholder="e.g., Near-miss with Haul Truck #7" />
+          <Input id="title" placeholder="e.g., Near-miss with Haul Truck #7" value={title} onChange={e => setTitle(e.target.value)} disabled={isDrafting || isSubmitting} />
         </div>
         <div className="space-y-2">
           <Label htmlFor="description">Free-Text Description</Label>
@@ -76,35 +123,30 @@ export function IncidentForm() {
             className="min-h-[120px]"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            disabled={isDrafting || isSubmitting}
           />
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="events">Link Relevant Events</Label>
-          <Input id="events" placeholder="Search for event IDs..." />
+         <div className="space-y-2">
+          <Label htmlFor="classification">Classification</Label>
+          <Input id="classification" placeholder="e.g., Safety, Operational" value={classification} onChange={e => setClassification(e.target.value)} disabled={isDrafting || isSubmitting} />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="classification">Classification</Label>
-          <Input id="classification" placeholder="e.g., Safety, Operational" />
+          <Label htmlFor="reportedBy">Reported By</Label>
+          <Input id="reportedBy" placeholder="Your Name" value={reportedBy} onChange={e => setReportedBy(e.target.value)} disabled={isDrafting || isSubmitting} />
         </div>
 
         <div className="flex flex-col gap-2 pt-2">
-            <Button
-                onClick={handleDraftReport}
-                disabled={isDrafting}
-                className="w-full font-bold"
-            >
-                {isDrafting ? (
-                    <Loader2 className="animate-spin" />
-                ) : (
-                    <Wand2 className="mr-2 h-4 w-4" />
-                )}
-                AI-Draft Full Report
-            </Button>
-            <Button variant="secondary" className="w-full">
-                Submit Manually
-            </Button>
+          <Button onClick={handleDraftReport} disabled={isDrafting || isSubmitting} className="w-full font-bold" type="button">
+            {isDrafting ? <Loader2 className="animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
+            AI-Draft Report
+          </Button>
+          <Button variant="secondary" type="submit" className="w-full" disabled={isDrafting || isSubmitting}>
+            {isSubmitting ? <Loader2 className="animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
+            Submit Manually
+          </Button>
         </div>
       </CardContent>
+      </form>
     </Card>
   );
 }
