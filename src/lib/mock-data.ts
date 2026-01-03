@@ -1,3 +1,5 @@
+import type { Incident } from '@/components/risk/incident-list';
+
 export const productionData = [
     { date: '2024-05-01', coal: 4000, iron: 2400 },
     { date: '2024-05-02', coal: 3000, iron: 1398 },
@@ -43,4 +45,31 @@ export const recommendedActionsData = [
     confidence: 0.98,
     evidenceLinks: ['/dashboard/risk?filter=near-miss', '/dashboard/people/training-matrix']
   }
+];
+
+export const mockIncidents: Incident[] = [
+  {
+    id: 'INC-001',
+    title: 'Near-miss with Haul Truck #7',
+    date: '2024-05-10T14:30:00Z',
+    status: 'Under Investigation',
+    classification: 'Safety',
+    reportedBy: 'John Doe',
+  },
+  {
+    id: 'INC-002',
+    title: 'Conveyor Belt C-03 Failure',
+    date: '2024-05-09T08:00:00Z',
+    status: 'Closed',
+    classification: 'Operational',
+    reportedBy: 'Jane Smith',
+  },
+  {
+    id: 'INC-003',
+    title: 'Unauthorized Zone Entry',
+    date: '2024-05-08T22:15:00Z',
+    status: 'CAPA Pending',
+    classification: 'Security',
+    reportedBy: 'Alex Johnson',
+  },
 ];

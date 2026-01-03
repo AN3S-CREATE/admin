@@ -1,5 +1,7 @@
 import { PageHeader } from "@/components/shared/page-header";
-import { Card, CardContent } from "@/components/ui/card";
+import { IncidentForm } from "@/components/risk/incident-form";
+import { IncidentList } from "@/components/risk/incident-list";
+import { mockIncidents } from "@/lib/mock-data";
 
 export default function RiskPage() {
   return (
@@ -8,11 +10,14 @@ export default function RiskPage() {
         title="Smart Risk"
         description="Incident capture, CAPA/actions board, and AI incident drafting."
       />
-       <Card className="glass-card">
-        <CardContent className="pt-6">
-          <p className="text-muted-foreground">The risk management module will be available here. This includes an incident capture system, a board for Corrective and Preventative Actions (CAPA), and an AI assistant for drafting incident reports.</p>
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="lg:col-span-1">
+            <IncidentForm />
+        </div>
+        <div className="lg:col-span-2">
+            <IncidentList incidents={mockIncidents} />
+        </div>
+      </div>
     </div>
   );
 }
