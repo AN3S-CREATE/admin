@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,23 +8,33 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { HardHat } from 'lucide-react';
+import { useAuth, useUser } from '@/firebase';
+import { initiateEmailSignIn, initiateAnonymousSignIn } from '@/firebase/non-blocking-login';
+import { useToast } from '@/hooks/use-toast';
+import { onAuthStateChanged } from 'firebase/auth';
 
 export function LoginForm() {
   const router = useRouter();
+  const auth = useAuth();
+  const { toast } = useToast();
   const [email, setEmail] = useState('demo@veramine.com');
   const [password, setPassword] = useState('password');
+  const { user, isUserLoading } = useUser();
+
+  useEffect(() => {
+    if (!isUserLoading && user) {
+      router.replace('/dashboard');
+    }
+  }, [user, isUserLoading, router]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, you'd validate credentials
-    sessionStorage.setItem('isLoggedIn', 'true');
-    router.replace('/dashboard');
+    initiateEmailSignIn(auth, email, password);
   };
 
   const handleDemoLogin = () => {
-    setEmail('demo@veramine.com');
-    setPassword('password');
-  }
+    initiateAnonymousSignIn(auth);
+  };
 
   return (
     <Card className="w-full max-w-md glass-card">
@@ -68,7 +78,7 @@ export function LoginForm() {
             </p>
           </div>
           <Button variant="outline" type="button" className="w-full" onClick={handleDemoLogin}>
-            Use Demo Credentials
+            Continue as Guest
           </Button>
         </CardFooter>
       </form>

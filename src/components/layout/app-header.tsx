@@ -15,13 +15,16 @@ import { Input } from '@/components/ui/input';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { usePathname, useRouter } from 'next/navigation';
 import { Fragment } from 'react';
+import { useAuth, useUser } from '@/firebase';
 
 export function AppHeader() {
   const router = useRouter();
   const pathname = usePathname();
+  const auth = useAuth();
+  const { user } = useUser();
 
   const handleLogout = () => {
-    sessionStorage.removeItem('isLoggedIn');
+    auth.signOut();
     router.replace('/login');
   };
 
@@ -72,13 +75,13 @@ export function AppHeader() {
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-8 w-8 rounded-full">
             <Avatar className="h-8 w-8">
-              <AvatarImage src="https://picsum.photos/seed/10/40/40" alt="User Avatar" data-ai-hint="person face" />
-              <AvatarFallback>SC</AvatarFallback>
+              <AvatarImage src={user?.photoURL ?? "https://picsum.photos/seed/10/40/40"} alt="User Avatar" data-ai-hint="person face" />
+              <AvatarFallback>{user?.email?.charAt(0).toUpperCase() ?? 'G'}</AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuLabel>{user?.isAnonymous ? "Guest" : user?.email}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>Settings</DropdownMenuItem>
           <DropdownMenuItem>Support</DropdownMenuItem>
