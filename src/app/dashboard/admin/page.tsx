@@ -1,5 +1,9 @@
-import { PageHeader } from "@/components/shared/page-header";
-import { Card, CardContent } from "@/components/ui/card";
+'use client';
+
+import { PageHeader } from '@/components/shared/page-header';
+import { UserInviteForm } from '@/components/admin/user-invite-form';
+import { UserList } from '@/components/admin/user-list';
+import { mockUsers } from '@/lib/mock-data';
 
 export default function AdminPage() {
   return (
@@ -8,11 +12,14 @@ export default function AdminPage() {
         title="Admin Console"
         description="Tenant management, site configuration, user access, role assignment, and feature toggle control."
       />
-      <Card className="glass-card">
-        <CardContent className="pt-6">
-          <p className="text-muted-foreground">Admin-level controls and configurations will be available here. This includes managing tenants, users, roles, and system-wide settings.</p>
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="lg:col-span-1">
+          <UserInviteForm />
+        </div>
+        <div className="lg:col-span-2">
+          <UserList users={mockUsers} />
+        </div>
+      </div>
     </div>
   );
 }

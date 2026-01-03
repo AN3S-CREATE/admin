@@ -1,4 +1,5 @@
 import type { Incident } from '@/components/risk/incident-list';
+import type { User } from '@/components/admin/user-list';
 
 export const productionData = [
     { date: '2024-05-01', coal: 4000, iron: 2400 },
@@ -72,4 +73,42 @@ export const mockIncidents: Incident[] = [
     classification: 'Security',
     reportedBy: 'Alex Johnson',
   },
+];
+
+export const mockUsers: User[] = [
+    {
+        id: 'usr_1',
+        email: 'admin@veramine.com',
+        displayName: 'Admin User',
+        role: 'admin',
+        status: 'active'
+    },
+    {
+        id: 'usr_2',
+        email: 'ops@veramine.com',
+        displayName: 'Ops Manager',
+        role: 'ops',
+        status: 'active'
+    },
+    {
+        id: 'usr_3',
+        email: 'safety@veramine.com',
+        displayName: 'Safety Officer',
+        role: 'safety',
+        status: 'active'
+    },
+    {
+        id: 'usr_4',
+        email: 'new.user@example.com',
+        displayName: 'Pending User',
+        role: 'viewer',
+        status: 'pending'
+    },
+     {
+        id: 'usr_5',
+        email: 'hr@veramine.com',
+        displayName: 'HR Manager',
+        role: 'hr',
+        status: 'active'
+    }
 ];

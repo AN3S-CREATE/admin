@@ -37,7 +37,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the User entity."
+          "description": "Unique identifier for the User entity, matching Firebase Auth UID."
         },
         "tenantId": {
           "type": "string",
@@ -63,9 +63,23 @@
             "viewer"
           ]
         },
-        "lastLogin": {
+        "status": {
           "type": "string",
-          "description": "Timestamp of the user's last login.",
+          "description": "The status of the user account.",
+          "enum": [
+            "pending",
+            "active",
+            "disabled"
+          ]
+        },
+        "invitedAt": {
+          "type": "string",
+          "description": "Timestamp of when the user invitation was sent.",
+          "format": "date-time"
+        },
+        "joinedAt": {
+          "type": "string",
+          "description": "Timestamp of when the user first logged in.",
           "format": "date-time"
         }
       },
@@ -73,8 +87,8 @@
         "id",
         "tenantId",
         "email",
-        "displayName",
-        "role"
+        "role",
+        "status"
       ]
     },
     "SiteConfiguration": {
@@ -498,7 +512,6 @@
         }
       }
     ],
-    "reasoning": "This Firestore structure is designed for a multi-tenant application (VeraMine Hub) emphasizing security, scalability, and ease of debugging, following the core design principles and strategy mandates. All data is namespaced under tenant-specific collections to provide strict data isolation. Denormalization is used to avoid hierarchical `get()` calls in security rules, ensuring Authorization Independence.\n\n**Authorization Independence (CRITICAL):**  Tenant ID is embedded within all documents to prevent collection group queries from returning cross-tenant data and to simplify tenant-based authorization rules. This applies to all entities. In addition, the User entity stores the user's role within the tenant.\n\n**QAPs Support (Rules are not Filters):** The database structure allows for efficient and secure `list` operations by leveraging structural segregation. Each collection stores a single entity type with uniform security requirements, making it easier to define simple and robust security rules. The User entity includes a `role` field to facilitate role-based access control.\n\n**Structure Breakdown:**\n\n*   `/tenants/{tenantId}`: Stores tenant-level information.\n*   `/tenants/{tenantId}/users/{userId}`: Stores user information, including their role within the tenant.\n*   `/tenants/{tenantId}/siteConfigurations/{siteConfigurationId}`: Stores site-specific configurations.\n*   `/tenants/{tenantId}/events/{eventId}`: Stores ingested events.\n*   `/tenants/{tenantId}/aiRecommendations/{aiRecommendationId}`: Stores AI-suggested actions.\n*   `/tenants/{tenantId}/shiftSummaries/{shiftSummaryId}`: Stores shift summaries.\n*   `/tenants/{tenantId}/incidents/{incidentId}`: Stores incident data.\n*   `/tenants/{tenantId}/alertRules/{alertRuleId}`: Stores alert rule configurations."
+    "reasoning": "This Firestore structure is designed for a multi-tenant application (VeraMine Hub) emphasizing security, scalability, and ease of debugging, following the core design principles and strategy mandates. All data is namespaced under tenant-specific collections to provide strict data isolation. Denormalization is used to avoid hierarchical `get()` calls in security rules, ensuring Authorization Independence.\\n\\n**Authorization Independence (CRITICAL):**  Tenant ID is embedded within all documents to prevent collection group queries from returning cross-tenant data and to simplify tenant-based authorization rules. This applies to all entities. In addition, the User entity stores the user's role within the tenant.\\n\\n**QAPs Support (Rules are not Filters):** The database structure allows for efficient and secure `list` operations by leveraging structural segregation. Each collection stores a single entity type with uniform security requirements, making it easier to define simple and robust security rules. The User entity includes a `role` field to facilitate role-based access control.\\n\\n**Structure Breakdown:**\\n\\n*   `/tenants/{tenantId}`: Stores tenant-level information.\\n*   `/tenants/{tenantId}/users/{userId}`: Stores user information, including their role within the tenant.\\n*   `/tenants/{tenantId}/siteConfigurations/{siteConfigurationId}`: Stores site-specific configurations.\\n*   `/tenants/{tenantId}/events/{eventId}`: Stores ingested events.\\n*   `/tenants/{tenantId}/aiRecommendations/{aiRecommendationId}`: Stores AI-suggested actions.\\n*   `/tenants/{tenantId}/shiftSummaries/{shiftSummaryId}`: Stores shift summaries.\\n*   `/tenants/{tenantId}/incidents/{incidentId}`: Stores incident data.\\n*   `/tenants/{tenantId}/alertRules/{alertRuleId}`: Stores alert rule configurations."
   }
 }
-    

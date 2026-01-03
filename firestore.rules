@@ -76,7 +76,7 @@ service cloud.firestore {
      */
     function isTenantAdmin(tenantId) {
       let userData = getUserData(tenantId);
-      return isSignedIn() && userData != null && userData.data.tenantId == tenantId && userData.data.role == 'admin';
+      return isTenantMember(tenantId) && userData.data.role == 'admin';
     }
 
     /**
@@ -84,7 +84,7 @@ service cloud.firestore {
      */
     function hasRole(tenantId, role) {
       let userData = getUserData(tenantId);
-      return isSignedIn() && userData != null && userData.data.tenantId == tenantId && userData.data.role == role;
+      return isTenantMember(tenantId) && userData.data.role == role;
     }
     
     /**
@@ -93,7 +93,7 @@ service cloud.firestore {
      */
     function canWriteInTenant(tenantId) {
       let userData = getUserData(tenantId);
-      return isSignedIn() && userData != null && userData.data.tenantId == tenantId && userData.data.role in ['admin', 'ops', 'hr', 'safety'];
+      return isTenantMember(tenantId) && userData.data.role in ['admin', 'ops', 'hr', 'safety'];
     }
 
     /**
@@ -108,6 +108,13 @@ service cloud.firestore {
      */
     function tenantIdIsImmutable() {
       return request.resource.data.tenantId == resource.data.tenantId;
+    }
+
+    /**
+     * Enforces that the user ID field cannot be changed on update.
+     */
+    function userIdIsImmutable() {
+      return request.resource.data.id == resource.data.id;
     }
 
     // ------------------------------------------------------------------------
@@ -133,16 +140,18 @@ service cloud.firestore {
     /**
      * @description Secures User profile documents within a tenant.
      * @path /tenants/{tenantId}/users/{userId}
-     * @allow (get) A user can read their own profile, or an admin can read any profile in the tenant.
-     * @allow (list) Tenant admins can list all users in their tenant.
-     * @deny (create) Normal users cannot create other user profiles.
+     * @allow (get, list) Tenant admins can read and list all users in their tenant.
+     * @allow (get) A user can read their own profile.
+     * @allow (create) An admin can create a new user profile (invite).
+     * @allow (update) An admin can update any user's profile.
+     * @allow (update) A user can update their own profile (e.g., displayName, status on first login).
      * @principle Enforces ownership and administrative oversight for user data.
      */
     match /tenants/{tenantId}/users/{userId} {
-      allow get: if isOwner(userId) || isTenantAdmin(tenantId);
-      allow list: if isTenantAdmin(tenantId);
-      allow create: if isTenantAdmin(tenantId) && request.resource.data.tenantId == tenantId && request.resource.data.id == userId;
-      allow update: if (isOwner(userId) || isTenantAdmin(tenantId)) && isExistingDoc() && tenantIdIsImmutable() && request.resource.data.id == resource.data.id;
+      allow get, list: if isTenantAdmin(tenantId);
+      allow get: if isOwner(userId);
+      allow create: if isTenantAdmin(tenantId) && incomingDataHasTenantId(tenantId);
+      allow update: if (isTenantAdmin(tenantId) || isOwner(userId)) && isExistingDoc() && tenantIdIsImmutable() && userIdIsImmutable();
       allow delete: if isTenantAdmin(tenantId) && isExistingDoc();
     }
 
@@ -150,7 +159,7 @@ service cloud.firestore {
      * @description Secures site configuration documents for a tenant.
      * @path /tenants/{tenantId}/siteConfigurations/{siteConfigurationId}
      * @allow (get, list) Any member of the tenant can read site configurations.
-     * @deny (create) A 'viewer' role cannot create new configurations.
+     * @deny (create, update, delete) A 'viewer' role cannot modify configurations.
      * @principle Enforces tenant isolation and role-based write access for tenant data.
      */
     match /tenants/{tenantId}/siteConfigurations/{siteConfigurationId} {
@@ -164,7 +173,7 @@ service cloud.firestore {
      * @description Secures ingested event documents for a tenant.
      * @path /tenants/{tenantId}/events/{eventId}
      * @allow (get, list) Any member of the tenant can read events.
-     * @deny (create) A 'viewer' role cannot create new events.
+     * @deny (create, update, delete) A 'viewer' role cannot modify events.
      * @principle Enforces tenant isolation and role-based write access for tenant data.
      */
     match /tenants/{tenantId}/events/{eventId} {
@@ -178,7 +187,7 @@ service cloud.firestore {
      * @description Secures AI recommendation documents for a tenant.
      * @path /tenants/{tenantId}/aiRecommendations/{aiRecommendationId}
      * @allow (get, list) Any member of the tenant can read AI recommendations.
-     * @deny (create) A 'viewer' role cannot create new recommendations.
+     * @deny (create, update, delete) A 'viewer' role cannot modify recommendations.
      * @principle Enforces tenant isolation and role-based write access for tenant data.
      */
     match /tenants/{tenantId}/aiRecommendations/{aiRecommendationId} {
@@ -192,7 +201,7 @@ service cloud.firestore {
      * @description Secures shift summary documents for a tenant.
      * @path /tenants/{tenantId}/shiftSummaries/{shiftSummaryId}
      * @allow (get, list) Any member of the tenant can read shift summaries.
-     * @deny (create) A 'viewer' role cannot create new summaries.
+     * @deny (create, update, delete) A 'viewer' role cannot modify summaries.
      * @principle Enforces tenant isolation and role-based write access for tenant data.
      */
     match /tenants/{tenantId}/shiftSummaries/{shiftSummaryId} {
@@ -206,7 +215,7 @@ service cloud.firestore {
      * @description Secures incident documents for a tenant.
      * @path /tenants/{tenantId}/incidents/{incidentId}
      * @allow (get, list) Any member of the tenant can read incidents.
-     * @deny (create) A 'viewer' role cannot create new incidents.
+     * @deny (create, update, delete) A 'viewer' role cannot modify incidents.
      * @principle Enforces tenant isolation and role-based write access for tenant data.
      */
     match /tenants/{tenantId}/incidents/{incidentId} {
@@ -220,7 +229,7 @@ service cloud.firestore {
      * @description Secures alert rule documents for a tenant.
      * @path /tenants/{tenantId}/alertRules/{alertRuleId}
      * @allow (get, list) Any member of the tenant can read alert rules.
-     * @deny (create) A 'viewer' role cannot create new alert rules.
+     * @deny (create, update, delete) A 'viewer' role cannot modify alert rules.
      * @principle Enforces tenant isolation and role-based write access for tenant data.
      */
     match /tenants/{tenantId}/alertRules/{alertRuleId} {
