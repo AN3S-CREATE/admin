@@ -7,6 +7,11 @@ import { MoreHorizontal, Users } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
+import { useFirestore } from "@/firebase";
+import { doc } from "firebase/firestore";
+import { updateDocumentNonBlocking } from "@/firebase/non-blocking-updates";
+import { useToast } from "@/hooks/use-toast";
+
 
 export type User = {
   id: string;
@@ -21,6 +26,8 @@ type UserListProps = {
   isLoading: boolean;
 };
 
+const MOCK_TENANT_ID = 'VeraMine';
+
 const statusColors: Record<User['status'], string> = {
     'active': 'bg-green-500/20 text-green-400 border-green-500/30',
     'pending': 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
@@ -28,6 +35,19 @@ const statusColors: Record<User['status'], string> = {
 }
 
 export function UserList({ users, isLoading }: UserListProps) {
+  const firestore = useFirestore();
+  const { toast } = useToast();
+
+  const handleUpdateUserStatus = (userId: string, status: User['status']) => {
+    if (!firestore) return;
+    const userDocRef = doc(firestore, 'tenants', MOCK_TENANT_ID, 'users', userId);
+    updateDocumentNonBlocking(userDocRef, { status });
+    toast({
+      title: 'User status updated',
+      description: `The user has been ${status}.`,
+    });
+  };
+
   return (
     <Card className="glass-card">
       <CardHeader>
@@ -81,8 +101,19 @@ export function UserList({ users, isLoading }: UserListProps) {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                               <DropdownMenuItem>Edit User</DropdownMenuItem>
-                              <DropdownMenuItem>Resend Invitation</DropdownMenuItem>
-                              <DropdownMenuItem className="text-destructive">Disable User</DropdownMenuItem>
+                              {user.status === 'pending' && <DropdownMenuItem>Resend Invitation</DropdownMenuItem>}
+                              {user.status === 'active' ? (
+                                <DropdownMenuItem 
+                                  className="text-destructive" 
+                                  onClick={() => handleUpdateUserStatus(user.id, 'disabled')}
+                                >
+                                  Disable User
+                                </DropdownMenuItem>
+                              ) : (
+                                <DropdownMenuItem onClick={() => handleUpdateUserStatus(user.id, 'active')}>
+                                  Enable User
+                                </DropdownMenuItem>
+                              )}
                           </DropdownMenuContent>
                       </DropdownMenu>
                   </TableCell>
