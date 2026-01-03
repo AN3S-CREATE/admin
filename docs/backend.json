@@ -298,13 +298,35 @@
         "capaSuggestions": {
           "type": "string",
           "description": "CAPA suggestions for the incident."
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time the incident occurred."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the incident.",
+          "enum": [
+            "Under Investigation",
+            "Closed",
+            "CAPA Pending"
+          ]
+        },
+        "reportedBy": {
+          "type": "string",
+          "description": "The name of the person who reported the incident."
         }
       },
       "required": [
         "id",
         "tenantId",
         "title",
-        "description"
+        "description",
+        "date",
+        "status",
+        "classification",
+        "reportedBy"
       ]
     },
     "AlertRule": {
