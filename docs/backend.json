@@ -145,8 +145,8 @@
           "description": "Type of the event (e.g., alarm, downtime, telemetry)."
         },
         "payload": {
-          "type": "string",
-          "description": "JSON string containing the event payload."
+          "type": "object",
+          "description": "Object containing the event payload."
         }
       },
       "required": [
