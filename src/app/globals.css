@@ -34,11 +34,11 @@
 
     --radius: 0.5rem;
 
-    --chart-1: 71 100% 51%;
-    --chart-2: 82 49% 57%;
-    --chart-3: 210 40% 98%;
-    --chart-4: 52 64% 46%; /* from #B8901F */
-    --chart-5: 48 84% 65%; /* from #EED56F */
+    --chart-1: 71 100% 51%; /* Accent primary: #D2FF05 */
+    --chart-2: 82 49% 57%; /* Accent secondary: #9AD153 */
+    --chart-3: 48 84% 65%; /* Warm highlight light: #EED56F */
+    --chart-4: 52 64% 46%; /* Warm highlight dark: #B8901F */
+    --chart-5: 56 63% 35%; /* Deep green: #527D2D */
     
     --sidebar-background: 222 57% 5%;
     --sidebar-foreground: 48 43% 97%;
@@ -81,9 +81,9 @@
 
     --chart-1: 71 100% 51%;
     --chart-2: 82 49% 57%;
-    --chart-3: 210 40% 98%;
+    --chart-3: 48 84% 65%;
     --chart-4: 52 64% 46%;
-    --chart-5: 48 84% 65%;
+    --chart-5: 56 63% 35%;
 
     --sidebar-background: 222 57% 5%;
     --sidebar-foreground: 48 43% 97%;
