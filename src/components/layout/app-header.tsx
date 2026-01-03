@@ -32,7 +32,7 @@ export function AppHeader() {
       <SidebarTrigger className="md:hidden" />
 
       <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
-        <span className="font-headline text-foreground">VeraMine</span>
+        <span className="font-headline text-foreground">Veralogix</span>
         {pathSegments.map((segment, index) => (
           <Fragment key={segment}>
             <ChevronRight className="h-4 w-4" />
