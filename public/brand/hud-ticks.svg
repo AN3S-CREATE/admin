@@ -1,15 +1,6 @@
 <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
-  <g stroke="rgba(210,255,5,0.08)" stroke-width="1">
-    <!-- Corner ticks -->
-    <path d="M 10 0 L 10 10 L 0 10" fill="none"/>
-    <path d="M 190 0 L 190 10 L 200 10" fill="none"/>
-    <path d="M 10 200 L 10 190 L 0 190" fill="none"/>
-    <path d="M 190 200 L 190 190 L 200 190" fill="none"/>
-    
-    <!-- Mid ticks -->
-    <line x1="100" y1="0" x2="100" y2="5"/>
-    <line x1="100" y1="200" x2="100" y2="195"/>
-    <line x1="0" y1="100" x2="5" y2="100"/>
-    <line x1="200" y1="100" x2="195" y2="100"/>
-  </g>
+  <path d="M 20 0 L 20 5 M 0 20 L 5 20" stroke="hsl(var(--primary) / 0.1)" stroke-width="1"/>
+  <path d="M 180 0 L 180 5 M 200 20 L 195 20" stroke="hsl(var(--primary) / 0.1)" stroke-width="1"/>
+  <path d="M 20 200 L 20 195 M 0 180 L 5 180" stroke="hsl(var(--primary) / 0.1)" stroke-width="1"/>
+  <path d="M 180 200 L 180 195 M 200 180 L 195 180" stroke="hsl(var(--primary) / 0.1)" stroke-width="1"/>
 </svg>
