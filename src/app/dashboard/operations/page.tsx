@@ -1,18 +1,26 @@
-import { PageHeader } from "@/components/shared/page-header";
-import { Card, CardContent } from "@/components/ui/card";
+'use client';
+
+import { PageHeader } from '@/components/shared/page-header';
+import { DowntimeCapture } from '@/components/operations/downtime-capture';
+import { ShiftHandover } from '@/components/operations/shift-handover';
+import { KpiBoard } from '@/components/operations/kpi-board';
 
 export default function OperationsPage() {
   return (
     <div className="space-y-8">
       <PageHeader
         title="Smart Operations"
-        description="Shift handover, downtime capture, and shift summary."
+        description="Shift handover, downtime capture, and operational KPIs."
       />
-      <Card className="glass-card">
-        <CardContent className="pt-6">
-          <p className="text-muted-foreground">The operations management module will be available here. This includes tools for shift handovers, logging downtime events with reason codes, and viewing an operational KPI board.</p>
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="lg:col-span-1 space-y-8">
+          <ShiftHandover />
+          <DowntimeCapture />
+        </div>
+        <div className="lg:col-span-2">
+          <KpiBoard />
+        </div>
+      </div>
     </div>
   );
 }
