@@ -1,0 +1,496 @@
+{
+  "entities": {
+    "Tenant": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Tenant",
+      "type": "object",
+      "description": "Represents a tenant within the VeraMine Hub multi-tenant platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Tenant entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the tenant."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of the tenant."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the tenant was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user within the VeraMine Hub platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Reference to Tenant. (Relationship: Tenant 1:N User)"
+        },
+        "email": {
+          "type": "string",
+          "description": "User's email address.",
+          "format": "email"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User's display name."
+        },
+        "role": {
+          "type": "string",
+          "description": "The user's role within the tenant (e.g., admin, user, viewer)."
+        },
+        "lastLogin": {
+          "type": "string",
+          "description": "Timestamp of the user's last login.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "tenantId",
+        "email",
+        "displayName",
+        "role"
+      ]
+    },
+    "SiteConfiguration": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SiteConfiguration",
+      "type": "object",
+      "description": "Represents the configuration settings for a specific site within a tenant.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the SiteConfiguration entity."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Reference to Tenant. (Relationship: Tenant 1:N SiteConfiguration)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the site."
+        },
+        "settings": {
+          "type": "string",
+          "description": "JSON string containing site-specific settings."
+        }
+      },
+      "required": [
+        "id",
+        "tenantId",
+        "name",
+        "settings"
+      ]
+    },
+    "Event": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Event",
+      "type": "object",
+      "description": "Represents a unified event ingested into the system.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Event entity."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Reference to Tenant. (Relationship: Tenant 1:N Event)"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp of when the event occurred.",
+          "format": "date-time"
+        },
+        "eventType": {
+          "type": "string",
+          "description": "Type of the event (e.g., alarm, downtime, telemetry)."
+        },
+        "payload": {
+          "type": "string",
+          "description": "JSON string containing the event payload."
+        }
+      },
+      "required": [
+        "id",
+        "tenantId",
+        "timestamp",
+        "eventType",
+        "payload"
+      ]
+    },
+    "AiRecommendation": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AiRecommendation",
+      "type": "object",
+      "description": "Represents an AI-suggested action.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the AiRecommendation entity."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Reference to Tenant. (Relationship: Tenant 1:N AiRecommendation)"
+        },
+        "recommendation": {
+          "type": "string",
+          "description": "The AI-suggested action."
+        },
+        "owner": {
+          "type": "string",
+          "description": "The owner of the recommendation."
+        },
+        "impact": {
+          "type": "string",
+          "description": "The impact of the recommendation."
+        },
+        "confidence": {
+          "type": "number",
+          "description": "The confidence level of the recommendation."
+        },
+        "evidenceLinks": {
+          "type": "array",
+          "description": "Links to the evidence supporting the recommendation.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "accepted": {
+          "type": "boolean",
+          "description": "Indicates if the recommendation was accepted or not."
+        }
+      },
+      "required": [
+        "id",
+        "tenantId",
+        "recommendation",
+        "owner",
+        "impact",
+        "confidence"
+      ]
+    },
+    "ShiftSummary": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ShiftSummary",
+      "type": "object",
+      "description": "Represents a shift or day summary.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ShiftSummary entity."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Reference to Tenant. (Relationship: Tenant 1:N ShiftSummary)"
+        },
+        "siteId": {
+          "type": "string",
+          "description": "The site to which this summary pertains."
+        },
+        "summary": {
+          "type": "string",
+          "description": "The generated shift summary."
+        },
+        "startTime": {
+          "type": "string",
+          "description": "The start time of the shift or day.",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "description": "The end time of the shift or day.",
+          "format": "date-time"
+        },
+        "sources": {
+          "type": "array",
+          "description": "References to Events used to generate the summary.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "tenantId",
+        "siteId",
+        "summary",
+        "startTime",
+        "endTime"
+      ]
+    },
+    "Incident": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Incident",
+      "type": "object",
+      "description": "Represents an incident within the VeraMine Hub platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Incident entity."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Reference to Tenant. (Relationship: Tenant 1:N Incident)"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the incident."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the incident."
+        },
+        "classification": {
+          "type": "string",
+          "description": "Classification of the incident."
+        },
+        "timeline": {
+          "type": "string",
+          "description": "Timeline of the incident."
+        },
+        "causes": {
+          "type": "string",
+          "description": "Causes of the incident."
+        },
+        "actions": {
+          "type": "string",
+          "description": "Actions taken during the incident."
+        },
+        "capaSuggestions": {
+          "type": "string",
+          "description": "CAPA suggestions for the incident."
+        }
+      },
+      "required": [
+        "id",
+        "tenantId",
+        "title",
+        "description"
+      ]
+    },
+    "AlertRule": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AlertRule",
+      "type": "object",
+      "description": "Represents an alert rule configuration.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the AlertRule entity."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Reference to Tenant. (Relationship: Tenant 1:N AlertRule)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the alert rule."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the alert rule."
+        },
+        "configuration": {
+          "type": "string",
+          "description": "JSON string containing the alert rule configuration."
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Indicates if the alert rule is enabled or not."
+        }
+      },
+      "required": [
+        "id",
+        "tenantId",
+        "name",
+        "description",
+        "configuration"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/tenants/{tenantId}",
+        "definition": {
+          "entityName": "Tenant",
+          "schema": {
+            "$ref": "#/backend/entities/Tenant"
+          },
+          "description": "Stores tenant-level information.",
+          "params": [
+            {
+              "name": "tenantId",
+              "description": "The unique identifier for the tenant."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/tenants/{tenantId}/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user information, including their role within the tenant. Includes denormalized 'tenantId' for authorization independence.",
+          "params": [
+            {
+              "name": "tenantId",
+              "description": "The unique identifier for the tenant."
+            },
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/tenants/{tenantId}/siteConfigurations/{siteConfigurationId}",
+        "definition": {
+          "entityName": "SiteConfiguration",
+          "schema": {
+            "$ref": "#/backend/entities/SiteConfiguration"
+          },
+          "description": "Stores site-specific configurations. Includes denormalized 'tenantId' for authorization independence.",
+          "params": [
+            {
+              "name": "tenantId",
+              "description": "The unique identifier for the tenant."
+            },
+            {
+              "name": "siteConfigurationId",
+              "description": "The unique identifier for the site configuration."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/tenants/{tenantId}/events/{eventId}",
+        "definition": {
+          "entityName": "Event",
+          "schema": {
+            "$ref": "#/backend/entities/Event"
+          },
+          "description": "Stores ingested events. Includes denormalized 'tenantId' for authorization independence.",
+          "params": [
+            {
+              "name": "tenantId",
+              "description": "The unique identifier for the tenant."
+            },
+            {
+              "name": "eventId",
+              "description": "The unique identifier for the event."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/tenants/{tenantId}/aiRecommendations/{aiRecommendationId}",
+        "definition": {
+          "entityName": "AiRecommendation",
+          "schema": {
+            "$ref": "#/backend/entities/AiRecommendation"
+          },
+          "description": "Stores AI-suggested actions. Includes denormalized 'tenantId' for authorization independence.",
+          "params": [
+            {
+              "name": "tenantId",
+              "description": "The unique identifier for the tenant."
+            },
+            {
+              "name": "aiRecommendationId",
+              "description": "The unique identifier for the AI recommendation."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/tenants/{tenantId}/shiftSummaries/{shiftSummaryId}",
+        "definition": {
+          "entityName": "ShiftSummary",
+          "schema": {
+            "$ref": "#/backend/entities/ShiftSummary"
+          },
+          "description": "Stores shift summaries. Includes denormalized 'tenantId' for authorization independence.",
+          "params": [
+            {
+              "name": "tenantId",
+              "description": "The unique identifier for the tenant."
+            },
+            {
+              "name": "shiftSummaryId",
+              "description": "The unique identifier for the shift summary."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/tenants/{tenantId}/incidents/{incidentId}",
+        "definition": {
+          "entityName": "Incident",
+          "schema": {
+            "$ref": "#/backend/entities/Incident"
+          },
+          "description": "Stores incident data. Includes denormalized 'tenantId' for authorization independence.",
+          "params": [
+            {
+              "name": "tenantId",
+              "description": "The unique identifier for the tenant."
+            },
+            {
+              "name": "incidentId",
+              "description": "The unique identifier for the incident."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/tenants/{tenantId}/alertRules/{alertRuleId}",
+        "definition": {
+          "entityName": "AlertRule",
+          "schema": {
+            "$ref": "#/backend/entities/AlertRule"
+          },
+          "description": "Stores alert rule configurations. Includes denormalized 'tenantId' for authorization independence.",
+          "params": [
+            {
+              "name": "tenantId",
+              "description": "The unique identifier for the tenant."
+            },
+            {
+              "name": "alertRuleId",
+              "description": "The unique identifier for the alert rule."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "This Firestore structure is designed for a multi-tenant application (VeraMine Hub) emphasizing security, scalability, and ease of debugging, following the core design principles and strategy mandates. All data is namespaced under tenant-specific collections to provide strict data isolation. Denormalization is used to avoid hierarchical `get()` calls in security rules, ensuring Authorization Independence.\n\n**Authorization Independence (CRITICAL):**  Tenant ID is embedded within all documents to prevent collection group queries from returning cross-tenant data and to simplify tenant-based authorization rules. This applies to all entities. In addition, the User entity stores the user's role within the tenant.\n\n**QAPs Support (Rules are not Filters):** The database structure allows for efficient and secure `list` operations by leveraging structural segregation. Each collection stores a single entity type with uniform security requirements, making it easier to define simple and robust security rules. The User entity includes a `role` field to facilitate role-based access control.\n\n**Structure Breakdown:**\n\n*   `/tenants/{tenantId}`: Stores tenant-level information.\n*   `/tenants/{tenantId}/users/{userId}`: Stores user information, including their role within the tenant.\n*   `/tenants/{tenantId}/siteConfigurations/{siteConfigurationId}`: Stores site-specific configurations.\n*   `/tenants/{tenantId}/events/{eventId}`: Stores ingested events.\n*   `/tenants/{tenantId}/aiRecommendations/{aiRecommendationId}`: Stores AI-suggested actions.\n*   `/tenants/{tenantId}/shiftSummaries/{shiftSummaryId}`: Stores shift summaries.\n*   `/tenants/{tenantId}/incidents/{incidentId}`: Stores incident data.\n*   `/tenants/{tenantId}/alertRules/{alertRuleId}`: Stores alert rule configurations."
+  }
+}

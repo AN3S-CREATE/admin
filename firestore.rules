@@ -1,0 +1,225 @@
+/**
+ * Core Philosophy: This ruleset enforces a strict multi-tenant data isolation model.
+ * All data is sandboxed within a tenant's data tree, and a user's access is
+ * strictly determined by their membership and role within that specific tenant.
+ *
+ * Data Structure: The entire database is structured hierarchically under the
+ * `/tenants/{tenantId}` path. All application data, including user profiles,
+ * configurations, and events, exists within a tenant's subcollections. This
+ * structure is fundamental to enforcing tenant-based security.
+ *
+ * Key Security Decisions:
+ * - Strict Tenant Isolation: A user can only access data within the tenant they belong to.
+ *   There is no cross-tenant data access.
+ * - Role-Based Access: User roles ('admin', 'user', 'viewer') defined in their
+ *   user profile (/tenants/{tenantId}/users/{userId}) determine write permissions.
+ *   Admins have full control, 'users' can create content, and 'viewers' are read-only.
+ * - Backend Provisioning: Tenant creation and deletion are disallowed from the client
+ *   to ensure these are controlled administrative actions.
+ * - No Public Enumeration: Listing tenants or all users within a tenant is
+ *   restricted to prevent data leakage and enumeration attacks.
+ *
+ * Denormalization for Authorization: To ensure fast and secure authorization, a user's
+ * permissions (their tenant ID and role) are determined by a single lookup to their
+ * user document at `/tenants/{tenantId}/users/{request.auth.uid}`. All other data
+ * documents contain a denormalized `tenantId` field to allow for efficient rules
+ * without requiring costly cross-collection `get` calls during authorization checks.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ------------------------------------------------------------------------
+    // Helper Functions
+    // ------------------------------------------------------------------------
+
+    /**
+     * Checks if a user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Checks if the currently authenticated user's UID matches the provided userId.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Checks if a document exists. Used for safe updates and deletes.
+     */
+    function isExistingDoc() {
+      return resource != null;
+    }
+
+    /**
+     * Retrieves the authenticated user's profile document from within a specific tenant.
+     * This is the source of truth for the user's role and tenant membership.
+     */
+    function getUserData(tenantId) {
+      return get(/databases/$(database)/documents/tenants/$(tenantId)/users/$(request.auth.uid));
+    }
+
+    /**
+     * Validates if the authenticated user is a legitimate member of the specified tenant.
+     * It checks for the existence of their user profile and verifies the tenantId within it.
+     */
+    function isTenantMember(tenantId) {
+      let userData = getUserData(tenantId);
+      return isSignedIn() && userData != null && userData.data.tenantId == tenantId;
+    }
+
+    /**
+     * Validates if the user is an 'admin' within the specified tenant.
+     */
+    function isTenantAdmin(tenantId) {
+      let userData = getUserData(tenantId);
+      return isSignedIn() && userData != null && userData.data.tenantId == tenantId && userData.data.role == 'admin';
+    }
+
+    /**
+     * Validates if the user has write permissions (role is 'admin' or 'user') for the tenant.
+     */
+    function canWriteInTenant(tenantId) {
+      let userData = getUserData(tenantId);
+      return isSignedIn() && userData != null && userData.data.tenantId == tenantId && userData.data.role in ['admin', 'user'];
+    }
+
+    /**
+     * Validates that the incoming document data contains the correct tenantId on create.
+     */
+    function incomingDataHasTenantId(tenantId) {
+      return request.resource.data.tenantId == tenantId;
+    }
+
+    /**
+     * Enforces that the tenantId field cannot be changed on update.
+     */
+    function tenantIdIsImmutable() {
+      return request.resource.data.tenantId == resource.data.tenantId;
+    }
+
+    // ------------------------------------------------------------------------
+    // Collection Rules
+    // ------------------------------------------------------------------------
+
+    /**
+     * @description Secures the root Tenant document.
+     * @path /tenants/{tenantId}
+     * @allow (get) A user who is a member of this tenant can read the tenant document.
+     * @deny (list) Listing all tenants is disabled to prevent enumeration.
+     * @deny (create) Tenant documents can only be created by a trusted backend process.
+     * @principle Restricts access to tenant members and prevents destructive client operations.
+     */
+    match /tenants/{tenantId} {
+      allow get: if isTenantMember(tenantId);
+      allow list: if false;
+      allow create: if false;
+      allow update: if isTenantAdmin(tenantId) && isExistingDoc();
+      allow delete: if false;
+    }
+
+    /**
+     * @description Secures User profile documents within a tenant.
+     * @path /tenants/{tenantId}/users/{userId}
+     * @allow (get) A user can read their own profile, or an admin can read any profile in the tenant.
+     * @allow (list) Tenant admins can list all users in their tenant.
+     * @deny (create) Normal users cannot create other user profiles.
+     * @principle Enforces ownership and administrative oversight for user data.
+     */
+    match /tenants/{tenantId}/users/{userId} {
+      allow get: if isOwner(userId) || isTenantAdmin(tenantId);
+      allow list: if isTenantAdmin(tenantId);
+      allow create: if isTenantAdmin(tenantId) && request.resource.data.tenantId == tenantId && request.resource.data.id == userId;
+      allow update: if (isOwner(userId) || isTenantAdmin(tenantId)) && isExistingDoc() && tenantIdIsImmutable() && request.resource.data.id == resource.data.id;
+      allow delete: if isTenantAdmin(tenantId) && isExistingDoc();
+    }
+
+    /**
+     * @description Secures site configuration documents for a tenant.
+     * @path /tenants/{tenantId}/siteConfigurations/{siteConfigurationId}
+     * @allow (get, list) Any member of the tenant can read site configurations.
+     * @deny (create) A 'viewer' role cannot create new configurations.
+     * @principle Enforces tenant isolation and role-based write access for tenant data.
+     */
+    match /tenants/{tenantId}/siteConfigurations/{siteConfigurationId} {
+      allow get, list: if isTenantMember(tenantId);
+      allow create: if canWriteInTenant(tenantId) && incomingDataHasTenantId(tenantId);
+      allow update: if canWriteInTenant(tenantId) && isExistingDoc() && tenantIdIsImmutable();
+      allow delete: if canWriteInTenant(tenantId) && isExistingDoc();
+    }
+
+    /**
+     * @description Secures ingested event documents for a tenant.
+     * @path /tenants/{tenantId}/events/{eventId}
+     * @allow (get, list) Any member of the tenant can read events.
+     * @deny (create) A 'viewer' role cannot create new events.
+     * @principle Enforces tenant isolation and role-based write access for tenant data.
+     */
+    match /tenants/{tenantId}/events/{eventId} {
+      allow get, list: if isTenantMember(tenantId);
+      allow create: if canWriteInTenant(tenantId) && incomingDataHasTenantId(tenantId);
+      allow update: if canWriteInTenant(tenantId) && isExistingDoc() && tenantIdIsImmutable();
+      allow delete: if canWriteInTenant(tenantId) && isExistingDoc();
+    }
+
+    /**
+     * @description Secures AI recommendation documents for a tenant.
+     * @path /tenants/{tenantId}/aiRecommendations/{aiRecommendationId}
+     * @allow (get, list) Any member of the tenant can read AI recommendations.
+     * @deny (create) A 'viewer' role cannot create new recommendations.
+     * @principle Enforces tenant isolation and role-based write access for tenant data.
+     */
+    match /tenants/{tenantId}/aiRecommendations/{aiRecommendationId} {
+      allow get, list: if isTenantMember(tenantId);
+      allow create: if canWriteInTenant(tenantId) && incomingDataHasTenantId(tenantId);
+      allow update: if canWriteInTenant(tenantId) && isExistingDoc() && tenantIdIsImmutable();
+      allow delete: if canWriteInTenant(tenantId) && isExistingDoc();
+    }
+
+    /**
+     * @description Secures shift summary documents for a tenant.
+     * @path /tenants/{tenantId}/shiftSummaries/{shiftSummaryId}
+     * @allow (get, list) Any member of the tenant can read shift summaries.
+     * @deny (create) A 'viewer' role cannot create new summaries.
+     * @principle Enforces tenant isolation and role-based write access for tenant data.
+     */
+    match /tenants/{tenantId}/shiftSummaries/{shiftSummaryId} {
+      allow get, list: if isTenantMember(tenantId);
+      allow create: if canWriteInTenant(tenantId) && incomingDataHasTenantId(tenantId);
+      allow update: if canWriteInTenant(tenantId) && isExistingDoc() && tenantIdIsImmutable();
+      allow delete: if canWriteInTenant(tenantId) && isExistingDoc();
+    }
+
+    /**
+     * @description Secures incident documents for a tenant.
+     * @path /tenants/{tenantId}/incidents/{incidentId}
+     * @allow (get, list) Any member of the tenant can read incidents.
+     * @deny (create) A 'viewer' role cannot create new incidents.
+     * @principle Enforces tenant isolation and role-based write access for tenant data.
+     */
+    match /tenants/{tenantId}/incidents/{incidentId} {
+      allow get, list: if isTenantMember(tenantId);
+      allow create: if canWriteInTenant(tenantId) && incomingDataHasTenantId(tenantId);
+      allow update: if canWriteInTenant(tenantId) && isExistingDoc() && tenantIdIsImmutable();
+      allow delete: if canWriteInTenant(tenantId) && isExistingDoc();
+    }
+
+    /**
+     * @description Secures alert rule documents for a tenant.
+     * @path /tenants/{tenantId}/alertRules/{alertRuleId}
+     * @allow (get, list) Any member of the tenant can read alert rules.
+     * @deny (create) A 'viewer' role cannot create new alert rules.
+     * @principle Enforces tenant isolation and role-based write access for tenant data.
+     */
+    match /tenants/{tenantId}/alertRules/{alertRuleId} {
+      allow get, list: if isTenantMember(tenantId);
+      allow create: if canWriteInTenant(tenantId) && incomingDataHasTenantId(tenantId);
+      allow update: if canWriteInTenant(tenantId) && isExistingDoc() && tenantIdIsImmutable();
+      allow delete: if canWriteInTenant(tenantId) && isExistingDoc();
+    }
+
+  }
+}
