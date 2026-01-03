@@ -1,12 +1,25 @@
 'use client';
 
 import { PageHeader } from "@/components/shared/page-header";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { DateRangePicker } from "@/components/shared/date-range-picker";
+import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
+import { collection } from 'firebase/firestore';
+import { IncidentList } from "@/components/risk/incident-list";
+
+const MOCK_TENANT_ID = 'VeraMine'; // As defined in use-user.tsx
 
 export default function SafetyReportPage() {
+  const firestore = useFirestore();
+
+  const incidentsColRef = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return collection(firestore, 'tenants', MOCK_TENANT_ID, 'incidents');
+  }, [firestore]);
+
+  const { data: incidents, isLoading } = useCollection(incidentsColRef);
+
   return (
     <div className="space-y-8">
        <PageHeader
@@ -21,11 +34,9 @@ export default function SafetyReportPage() {
             </Button>
         </div>
       </PageHeader>
-      <Card className="glass-card">
-        <CardContent className="pt-6">
-          <p className="text-muted-foreground">Safety metrics and incident reports will be displayed here.</p>
-        </CardContent>
-      </Card>
+      
+      <IncidentList incidents={incidents || []} isLoading={isLoading} />
+      
     </div>
   );
 }
