@@ -28,6 +28,7 @@ export async function opsCopilot(input: OpsCopilotInput): Promise<OpsCopilotOutp
 const prompt = ai.definePrompt({
   name: 'opsCopilotPrompt',
   input: {schema: OpsCopilotInputSchema},
+  output: {schema: OpsCopilotOutputSchema},
   prompt: `You are an expert AI assistant for mining operations called Ops Copilot. 
   Your goal is to provide helpful and accurate information to the user.
   For now, you are in a conversational mode. Respond to the user's message as helpfully as possible.
@@ -43,8 +44,7 @@ const opsCopilotFlow = ai.defineFlow(
     outputSchema: OpsCopilotOutputSchema,
   },
   async input => {
-    const llmResponse = await prompt(input);
-    const output = llmResponse.output();
+    const {output} = await prompt(input);
     if (!output) {
       return { response: "I'm sorry, I couldn't generate a response." };
     }
