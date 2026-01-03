@@ -1,18 +1,29 @@
-import { PageHeader } from "@/components/shared/page-header";
-import { Card, CardContent } from "@/components/ui/card";
+'use client';
+
+import { PageHeader } from '@/components/shared/page-header';
+import { PeopleList } from '@/components/people/people-list';
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { collection } from 'firebase/firestore';
+
+const MOCK_TENANT_ID = 'VeraMine'; // As defined in use-user.tsx
 
 export default function PeoplePage() {
+  const firestore = useFirestore();
+
+  const usersColRef = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return collection(firestore, 'tenants', MOCK_TENANT_ID, 'users');
+  }, [firestore]);
+
+  const { data: users, isLoading } = useCollection(usersColRef);
+
   return (
     <div className="space-y-8">
       <PageHeader
         title="Smart People"
         description="Onboarding checklist, training matrix, compliance expiry &amp; alerts."
       />
-      <Card className="glass-card">
-        <CardContent className="pt-6">
-          <p className="text-muted-foreground">The personnel management module will be available here. This will feature onboarding checklists, a skills and training matrix, and alerts for compliance expiry.</p>
-        </CardContent>
-      </Card>
+      <PeopleList users={users || []} isLoading={isLoading} />
     </div>
   );
 }

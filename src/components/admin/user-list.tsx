@@ -11,15 +11,8 @@ import { useFirestore } from "@/firebase";
 import { doc } from "firebase/firestore";
 import { updateDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { useToast } from "@/hooks/use-toast";
+import type { User } from '@/types/user';
 
-
-export type User = {
-  id: string;
-  email: string;
-  displayName: string | null;
-  role: 'admin' | 'ops' | 'hr' | 'safety' | 'viewer';
-  status: 'pending' | 'active' | 'disabled';
-};
 
 type UserListProps = {
   users: User[];

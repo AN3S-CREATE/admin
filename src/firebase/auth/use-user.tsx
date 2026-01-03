@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { onAuthStateChanged, type User as FirebaseAuthUser } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { useAuth, useFirestore, useMemoFirebase } from '@/firebase';
-import type { User as AppUser } from '@/components/admin/user-list';
+import type { User as AppUser } from '@/types/user';
 
 export interface UseUserResult {
   user: (AppUser & { uid: string }) | null;
