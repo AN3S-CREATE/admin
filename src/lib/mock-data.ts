@@ -1,5 +1,11 @@
 import type { Incident } from '@/components/risk/incident-list';
 import type { User } from '@/components/admin/user-list';
+import {
+    Activity,
+    ArrowUp,
+    Truck,
+    AlertTriangle,
+  } from "lucide-react";
 
 export const productionData = [
     { date: '2024-05-01', coal: 4000, iron: 2400 },
@@ -112,3 +118,38 @@ export const mockUsers: User[] = [
         status: 'active'
     }
 ];
+
+export const statCards = [
+    {
+      title: "Overall Production",
+      value: "14,280 Tonnes",
+      icon: Activity,
+      trend: "up" as const,
+      trendValue: "12.5%",
+      period: "vs last month",
+    },
+    {
+      title: "Equipment Uptime",
+      value: "98.2%",
+      icon: ArrowUp,
+      trend: "up" as const,
+      trendValue: "1.2%",
+      period: "vs last month",
+    },
+    {
+      title: "Fleet Availability",
+      value: "89%",
+      icon: Truck,
+      trend: "down" as const,
+      trendValue: "2.1%",
+      period: "vs last month",
+    },
+    {
+      title: "Active Alerts",
+      value: "3",
+      icon: AlertTriangle,
+      trend: "static" as const,
+      trendValue: "High Priority",
+      period: "needs attention",
+    },
+  ];
