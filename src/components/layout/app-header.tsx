@@ -132,8 +132,8 @@ export function AppHeader() {
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
               <Avatar className="h-8 w-8">
                 <AvatarImage
-                  src={userAvatar?.imageUrl ?? 'https://picsum.photos/seed/10/40/40'}
-                  alt="User Avatar"
+                  src={userAvatar?.imageUrl}
+                  alt={userAvatar?.description}
                   data-ai-hint={userAvatar?.imageHint}
                 />
                 <AvatarFallback>
