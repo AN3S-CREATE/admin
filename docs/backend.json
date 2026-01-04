@@ -373,6 +373,55 @@
         "description",
         "configuration"
       ]
+    },
+    "Transport": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Transport",
+      "type": "object",
+      "description": "Represents a vehicle in the fleet.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the vehicle."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Reference to Tenant. (Relationship: Tenant 1:N Transport)"
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of vehicle.",
+          "enum": ["Haul Truck", "Light Vehicle", "Excavator", "Dozer"]
+        },
+        "status": {
+          "type": "string",
+          "description": "Current status of the vehicle.",
+          "enum": ["On Route", "Idle", "Maintenance", "Offline"]
+        },
+        "currentTrip": {
+          "type": ["string", "null"],
+          "description": "Identifier for the current trip or assignment."
+        },
+        "driver": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": ["id", "name"]
+        }
+      },
+      "required": [
+        "id",
+        "tenantId",
+        "type",
+        "status",
+        "driver"
+      ]
     }
   },
   "auth": {
@@ -429,6 +478,12 @@
         "$ref": "#/entities/AlertRule"
       },
       "description": "Stores alert rule configurations. Includes denormalized 'tenantId' for authorization independence."
+    },
+    "/tenants/{tenantId}/vehicles/{vehicleId}": {
+      "schema": {
+        "$ref": "#/entities/Transport"
+      },
+      "description": "Stores vehicle fleet data. Includes denormalized 'tenantId' for authorization independence."
     }
   }
 }

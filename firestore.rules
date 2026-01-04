@@ -240,5 +240,18 @@ service cloud.firestore {
       allow delete: if canWriteInTenant(tenantId) && isExistingDoc();
     }
 
+    /**
+     * @description Secures vehicle documents for a tenant.
+     * @path /tenants/{tenantId}/vehicles/{vehicleId}
+     * @allow (get, list) Any member of the tenant can read vehicle data.
+     * @deny (create, update, delete) A 'viewer' role cannot modify vehicle data.
+     * @principle Enforces tenant isolation and role-based write access for tenant data.
+     */
+    match /tenants/{tenantId}/vehicles/{vehicleId} {
+      allow get, list: if isTenantMember(tenantId);
+      allow create: if canWriteInTenant(tenantId) && incomingDataHasTenantId(tenantId);
+      allow update: if canWriteInTenant(tenantId) && isExistingDoc() && tenantIdIsImmutable();
+      allow delete: if canWriteInTenant(tenantId) && isExistingDoc();
+    }
   }
 }

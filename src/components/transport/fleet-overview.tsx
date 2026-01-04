@@ -7,10 +7,12 @@ import { MoreHorizontal, Truck, Shovel, Construction } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { Button } from '../ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import type { Vehicle } from '@/lib/transport-data';
+import { Skeleton } from '../ui/skeleton';
+import type { Vehicle } from '@/types/transport';
 
 type FleetOverviewProps = {
   vehicles: Vehicle[];
+  isLoading: boolean;
 };
 
 const statusColors: Record<Vehicle['status'], string> = {
@@ -27,7 +29,7 @@ const vehicleTypeIcons: Record<Vehicle['type'], React.ElementType> = {
     'Dozer': Construction,
 };
 
-export function FleetOverview({ vehicles }: FleetOverviewProps) {
+export function FleetOverview({ vehicles, isLoading }: FleetOverviewProps) {
   return (
     <Card className="glass-card">
       <CardHeader>
@@ -52,49 +54,68 @@ export function FleetOverview({ vehicles }: FleetOverviewProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {vehicles.map((vehicle) => {
-              const Icon = vehicleTypeIcons[vehicle.type] || Truck;
-              return (
-                <TableRow key={vehicle.id} className="hover:bg-muted/30">
-                  <TableCell className="font-medium">
-                    <div className="flex items-center gap-3">
-                      <Icon className="h-5 w-5 text-primary" />
-                      {vehicle.id}
-                    </div>
-                  </TableCell>
-                  <TableCell>{vehicle.type}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className={`${statusColors[vehicle.status]} w-28 justify-center`}>
-                      {vehicle.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">{vehicle.currentTrip || 'N/A'}</TableCell>
-                   <TableCell>
-                     <div className="flex items-center gap-2">
-                        <Avatar className="h-8 w-8">
-                            <AvatarImage src={`https://i.pravatar.cc/150?u=${vehicle.driver.id}`} alt={vehicle.driver.name} />
-                            <AvatarFallback>{vehicle.driver.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <span className="text-sm">{vehicle.driver.name}</span>
-                     </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>View Live Location</DropdownMenuItem>
-                        <DropdownMenuItem>Assign New Trip</DropdownMenuItem>
-                        <DropdownMenuItem>Schedule Maintenance</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+            {isLoading ? (
+               Array.from({ length: 5 }).map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                  <TableCell><Skeleton className="h-6 w-28" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-40" /></TableCell>
+                  <TableCell><Skeleton className="h-8 w-24" /></TableCell>
+                  <TableCell><Skeleton className="h-8 w-8" /></TableCell>
                 </TableRow>
-              );
-            })}
+              ))
+            ) : vehicles.length === 0 ? (
+                <TableRow>
+                    <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                        No vehicles found.
+                    </TableCell>
+                </TableRow>
+            ) : (
+              vehicles.map((vehicle) => {
+                const Icon = vehicleTypeIcons[vehicle.type] || Truck;
+                return (
+                  <TableRow key={vehicle.id} className="hover:bg-muted/30">
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-3">
+                        <Icon className="h-5 w-5 text-primary" />
+                        {vehicle.id}
+                      </div>
+                    </TableCell>
+                    <TableCell>{vehicle.type}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className={`${statusColors[vehicle.status]} w-28 justify-center`}>
+                        {vehicle.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">{vehicle.currentTrip || 'N/A'}</TableCell>
+                    <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8">
+                              <AvatarImage src={`https://i.pravatar.cc/150?u=${vehicle.driver.id}`} alt={vehicle.driver.name} />
+                              <AvatarFallback>{vehicle.driver.name.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <span className="text-sm">{vehicle.driver.name}</span>
+                        </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>View Live Location</DropdownMenuItem>
+                          <DropdownMenuItem>Assign New Trip</DropdownMenuItem>
+                          <DropdownMenuItem>Schedule Maintenance</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
           </TableBody>
         </Table>
       </CardContent>
