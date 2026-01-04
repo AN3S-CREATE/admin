@@ -12,7 +12,7 @@ import { draftIncidentReport, type DraftIncidentReportOutput } from '@/ai/flows/
 import { useFirestore, useUser } from '@/firebase';
 import { collection } from 'firebase/firestore';
 import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
-import type { Incident } from './incident-list';
+import type { Incident } from '@/types/incident';
 
 const MOCK_TENANT_ID = 'VeraMine'; // As defined in use-user.tsx
 
