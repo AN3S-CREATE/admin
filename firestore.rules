@@ -1,3 +1,4 @@
+
 /**
  * Core Philosophy: This ruleset enforces a strict multi-tenant data isolation model.
  * All data is sandboxed within a tenant's data tree, and a user's access is
