@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { statCards } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const containerVariants = {
   hidden: { opacity: 1 },
@@ -21,6 +22,15 @@ const containerVariants = {
 };
 
 export default function ProductionReportPage() {
+  const { toast } = useToast();
+
+  const handleExport = () => {
+    toast({
+      title: 'Export to CSV',
+      description: 'This feature is a placeholder in the prototype.',
+    });
+  };
+
   return (
     <div className="space-y-8">
       <PageHeader
@@ -29,7 +39,7 @@ export default function ProductionReportPage() {
       >
         <div className="flex items-center gap-2">
             <DateRangePicker />
-            <Button variant="outline">
+            <Button variant="outline" onClick={handleExport}>
                 <Download className="mr-2 h-4 w-4" />
                 Export CSV
             </Button>

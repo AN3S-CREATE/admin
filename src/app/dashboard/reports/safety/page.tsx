@@ -7,11 +7,13 @@ import { DateRangePicker } from "@/components/shared/date-range-picker";
 import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
 import { collection } from 'firebase/firestore';
 import { IncidentList } from "@/components/risk/incident-list";
+import { useToast } from "@/hooks/use-toast";
 
 const MOCK_TENANT_ID = 'VeraMine'; // As defined in use-user.tsx
 
 export default function SafetyReportPage() {
   const firestore = useFirestore();
+  const { toast } = useToast();
 
   const incidentsColRef = useMemoFirebase(() => {
     if (!firestore) return null;
@@ -19,6 +21,13 @@ export default function SafetyReportPage() {
   }, [firestore]);
 
   const { data: incidents, isLoading } = useCollection(incidentsColRef);
+  
+  const handleExport = () => {
+    toast({
+      title: 'Export to CSV',
+      description: 'This feature is a placeholder in the prototype.',
+    });
+  };
 
   return (
     <div className="space-y-8">
@@ -28,7 +37,7 @@ export default function SafetyReportPage() {
       >
         <div className="flex items-center gap-2">
             <DateRangePicker />
-            <Button variant="outline">
+            <Button variant="outline" onClick={handleExport}>
                 <Download className="mr-2 h-4 w-4" />
                 Export CSV
             </Button>
