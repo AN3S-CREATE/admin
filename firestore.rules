@@ -66,6 +66,7 @@ service cloud.firestore {
     /**
      * Validates if the authenticated user is a legitimate member of the specified tenant.
      * It checks for the existence of their user profile and verifies the tenantId within it.
+     * This is the primary function for enforcing tenant isolation.
      */
     function isTenantMember(tenantId) {
       let userData = getUserData(tenantId);
@@ -90,7 +91,8 @@ service cloud.firestore {
     
     /**
      * Validates if the user has write permissions for the tenant.
-     * This now includes the more granular roles from the spec.
+     * This is the primary function for enforcing role-based write access.
+     * 'viewer' is excluded, making it a read-only role.
      */
     function canWriteInTenant(tenantId) {
       let userData = getUserData(tenantId);
@@ -127,7 +129,7 @@ service cloud.firestore {
      * @path /tenants/{tenantId}
      * @allow (get) A user who is a member of this tenant can read the tenant document.
      * @deny (list) Listing all tenants is disabled to prevent enumeration.
-     * @deny (create) Tenant documents can only be created by a trusted backend process.
+     * @deny (create, delete) Tenant documents can only be managed by a trusted backend process.
      * @principle Restricts access to tenant members and prevents destructive client operations.
      */
     match /tenants/{tenantId} {
@@ -136,122 +138,35 @@ service cloud.firestore {
       allow create: if false;
       allow update: if isTenantAdmin(tenantId) && isExistingDoc();
       allow delete: if false;
-    }
 
-    /**
-     * @description Secures User profile documents within a tenant.
-     * @path /tenants/{tenantId}/users/{userId}
-     * @allow (get, list) Tenant admins can read and list all users in their tenant.
-     * @allow (get) A user can read their own profile.
-     * @allow (create) An admin can create a new user profile (invite).
-     * @allow (update) An admin can update any user's profile.
-     * @allow (update) A user can update their own profile (e.g., displayName, status on first login).
-     * @principle Enforces ownership and administrative oversight for user data.
-     */
-    match /tenants/{tenantId}/users/{userId} {
-      allow get, list: if isTenantAdmin(tenantId);
-      allow get: if isOwner(userId);
-      allow create: if isTenantAdmin(tenantId) && incomingDataHasTenantId(tenantId);
-      allow update: if (isTenantAdmin(tenantId) || isOwner(userId)) && isExistingDoc() && tenantIdIsImmutable() && userIdIsImmutable();
-      allow delete: if isTenantAdmin(tenantId) && isExistingDoc();
-    }
+      /**
+       * @description Secures User profile documents within a tenant.
+       * @path /tenants/{tenantId}/users/{userId}
+       * @allow (get, list) An admin can read and list all users in their tenant.
+       * @allow (get) A user can read their own profile.
+       * @allow (create) An admin can invite/create new users.
+       * @allow (update) An admin can update any user; a user can update their own profile.
+       * @principle Enforces ownership and administrative oversight for user data.
+       */
+      match /tenants/{tenantId}/users/{userId} {
+        allow get, list: if isTenantAdmin(tenantId);
+        allow get: if isOwner(userId) && isTenantMember(tenantId);
+        allow create: if isTenantAdmin(tenantId) && incomingDataHasTenantId(tenantId);
+        allow update: if (isTenantAdmin(tenantId) || (isOwner(userId) && isTenantMember(tenantId))) && isExistingDoc() && tenantIdIsImmutable() && userIdIsImmutable();
+        allow delete: if isTenantAdmin(tenantId) && isExistingDoc();
+      }
 
-    /**
-     * @description Secures site configuration documents for a tenant.
-     * @path /tenants/{tenantId}/siteConfigurations/{siteConfigurationId}
-     * @allow (get, list) Any member of the tenant can read site configurations.
-     * @deny (create, update, delete) A 'viewer' role cannot modify configurations.
-     * @principle Enforces tenant isolation and role-based write access for tenant data.
-     */
-    match /tenants/{tenantId}/siteConfigurations/{siteConfigurationId} {
-      allow get, list: if isTenantMember(tenantId);
-      allow create: if canWriteInTenant(tenantId) && incomingDataHasTenantId(tenantId);
-      allow update: if canWriteInTenant(tenantId) && isExistingDoc() && tenantIdIsImmutable();
-      allow delete: if canWriteInTenant(tenantId) && isExistingDoc();
-    }
-
-    /**
-     * @description Secures ingested event documents for a tenant.
-     * @path /tenants/{tenantId}/events/{eventId}
-     * @allow (get, list) Any member of the tenant can read events.
-     * @deny (create, update, delete) A 'viewer' role cannot modify events.
-     * @principle Enforces tenant isolation and role-based write access for tenant data.
-     */
-    match /tenants/{tenantId}/events/{eventId} {
-      allow get, list: if isTenantMember(tenantId);
-      allow create: if canWriteInTenant(tenantId) && incomingDataHasTenantId(tenantId);
-      allow update: if canWriteInTenant(tenantId) && isExistingDoc() && tenantIdIsImmutable();
-      allow delete: if canWriteInTenant(tenantId) && isExistingDoc();
-    }
-
-    /**
-     * @description Secures AI recommendation documents for a tenant.
-     * @path /tenants/{tenantId}/aiRecommendations/{aiRecommendationId}
-     * @allow (get, list) Any member of the tenant can read AI recommendations.
-     * @deny (create, update, delete) A 'viewer' role cannot modify recommendations.
-     * @principle Enforces tenant isolation and role-based write access for tenant data.
-     */
-    match /tenants/{tenantId}/aiRecommendations/{aiRecommendationId} {
-      allow get, list: if isTenantMember(tenantId);
-      allow create: if canWriteInTenant(tenantId) && incomingDataHasTenantId(tenantId);
-      allow update: if canWriteInTenant(tenantId) && isExistingDoc() && tenantIdIsImmutable();
-      allow delete: if canWriteInTenant(tenantId) && isExistingDoc();
-    }
-
-    /**
-     * @description Secures shift summary documents for a tenant.
-     * @path /tenants/{tenantId}/shiftSummaries/{shiftSummaryId}
-     * @allow (get, list) Any member of the tenant can read shift summaries.
-     * @deny (create, update, delete) A 'viewer' role cannot modify summaries.
-     * @principle Enforces tenant isolation and role-based write access for tenant data.
-     */
-    match /tenants/{tenantId}/shiftSummaries/{shiftSummaryId} {
-      allow get, list: if isTenantMember(tenantId);
-      allow create: if canWriteInTenant(tenantId) && incomingDataHasTenantId(tenantId);
-      allow update: if canWriteInTenant(tenantId) && isExistingDoc() && tenantIdIsImmutable();
-      allow delete: if canWriteInTenant(tenantId) && isExistingDoc();
-    }
-
-    /**
-     * @description Secures incident documents for a tenant.
-     * @path /tenants/{tenantId}/incidents/{incidentId}
-     * @allow (get, list) Any member of the tenant can read incidents.
-     * @deny (create, update, delete) A 'viewer' role cannot modify incidents.
-     * @principle Enforces tenant isolation and role-based write access for tenant data.
-     */
-    match /tenants/{tenantId}/incidents/{incidentId} {
-      allow get, list: if isTenantMember(tenantId);
-      allow create: if canWriteInTenant(tenantId) && incomingDataHasTenantId(tenantId);
-      allow update: if canWriteInTenant(tenantId) && isExistingDoc() && tenantIdIsImmutable();
-      allow delete: if canWriteInTenant(tenantId) && isExistingDoc();
-    }
-
-    /**
-     * @description Secures alert rule documents for a tenant.
-     * @path /tenants/{tenantId}/alertRules/{alertRuleId}
-     * @allow (get, list) Any member of the tenant can read alert rules.
-     * @deny (create, update, delete) A 'viewer' role cannot modify alert rules.
-     * @principle Enforces tenant isolation and role-based write access for tenant data.
-     */
-    match /tenants/{tenantId}/alertRules/{alertRuleId} {
-      allow get, list: if isTenantMember(tenantId);
-      allow create: if canWriteInTenant(tenantId) && incomingDataHasTenantId(tenantId);
-      allow update: if canWriteInTenant(tenantId) && isExistingDoc() && tenantIdIsImmutable();
-      allow delete: if canWriteInTenant(tenantId) && isExistingDoc();
-    }
-
-    /**
-     * @description Secures vehicle documents for a tenant.
-     * @path /tenants/{tenantId}/vehicles/{vehicleId}
-     * @allow (get, list) Any member of the tenant can read vehicle data.
-     * @deny (create, update, delete) A 'viewer' role cannot modify vehicle data.
-     * @principle Enforces tenant isolation and role-based write access for tenant data.
-     */
-    match /tenants/{tenantId}/vehicles/{vehicleId} {
-      allow get, list: if isTenantMember(tenantId);
-      allow create: if canWriteInTenant(tenantId) && incomingDataHasTenantId(tenantId);
-      allow update: if canWriteInTenant(tenantId) && isExistingDoc() && tenantIdIsImmutable();
-      allow delete: if canWriteInTenant(tenantId) && isExistingDoc();
+      /**
+       * @description Generic rule for most data subcollections within a tenant.
+       * @path /tenants/{tenantId}/{collection}/{docId}
+       * @allow (read) Any member of the tenant can read data.
+       * @allow (write) Only users with a role in ['admin', 'ops', 'hr', 'safety'] can write. 'viewer' is implicitly read-only.
+       * @principle Enforces tenant isolation for reads and role-based access for writes.
+       */
+      match /{collection}/{docId} {
+        allow read: if isTenantMember(tenantId);
+        allow write: if canWriteInTenant(tenantId) && (isExistingDoc() ? tenantIdIsImmutable() : incomingDataHasTenantId(tenantId));
+      }
     }
   }
 }
