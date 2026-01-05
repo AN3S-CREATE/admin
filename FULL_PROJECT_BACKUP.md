@@ -21,9 +21,9 @@ You can copy the contents of each file into new files on your local machine.
 # FILE: README.md
 
 ```md
-# Firebase Studio
+# VeraMine Hub
 
-This is a NextJS starter in Firebase Studio.
+This is a NextJS starter in Firebase Studio, customized to be the VeraMine Hub.
 
 To get started, take a look at src/app/page.tsx.
 ```
@@ -71,6 +71,530 @@ runConfig:
     "hooks": "@/hooks"
   },
   "iconLibrary": "lucide"
+}
+```
+
+---
+---
+---
+
+# FILE: docs/backend.json
+
+```json
+{
+  "entities": {
+    "Tenant": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Tenant",
+      "type": "object",
+      "description": "Represents a tenant within the VeraMine Hub multi-tenant platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Tenant entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the tenant."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of the tenant."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the tenant was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user within the VeraMine Hub platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity, matching Firebase Auth UID."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Reference to Tenant. (Relationship: Tenant 1:N User)"
+        },
+        "email": {
+          "type": "string",
+          "description": "User's email address.",
+          "format": "email"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User's display name."
+        },
+        "role": {
+          "type": "string",
+          "description": "The user's role within the tenant.",
+          "enum": [
+            "admin",
+            "ops",
+            "hr",
+            "safety",
+            "viewer"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the user account.",
+          "enum": [
+            "pending",
+            "active",
+            "disabled"
+          ]
+        },
+        "invitedAt": {
+          "type": "string",
+          "description": "Timestamp of when the user invitation was sent.",
+          "format": "date-time"
+        },
+        "joinedAt": {
+          "type": "string",
+          "description": "Timestamp of when the user first logged in.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "tenantId",
+        "email",
+        "role",
+        "status"
+      ]
+    },
+    "SiteConfiguration": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SiteConfiguration",
+      "type": "object",
+      "description": "Represents the configuration settings for a specific site within a tenant.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the SiteConfiguration entity."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Reference to Tenant. (Relationship: Tenant 1:N SiteConfiguration)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the site."
+        },
+        "settings": {
+          "type": "string",
+          "description": "JSON string containing site-specific settings."
+        }
+      },
+      "required": [
+        "id",
+        "tenantId",
+        "name",
+        "settings"
+      ]
+    },
+    "Event": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Event",
+      "type": "object",
+      "description": "Represents a unified event ingested into the system.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Event entity."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Reference to Tenant. (Relationship: Tenant 1:N Event)"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp of when the event occurred.",
+          "format": "date-time"
+        },
+        "eventType": {
+          "type": "string",
+          "description": "Type of the event (e.g., alarm, downtime, telemetry)."
+        },
+        "actor": {
+          "type": "string",
+          "description": "The user or system that generated the event."
+        },
+        "payload": {
+          "type": "object",
+          "description": "A structured object representing the event payload, which varies by eventType. For example, a 'downtime' event might have { assetId: 'string', duration: 'number' }.",
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "id",
+        "tenantId",
+        "timestamp",
+        "eventType",
+        "payload",
+        "actor"
+      ]
+    },
+    "AiRecommendation": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AiRecommendation",
+      "type": "object",
+      "description": "Represents an AI-suggested action with full audit trail.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the AiRecommendation entity."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Reference to Tenant. (Relationship: Tenant 1:N AiRecommendation)"
+        },
+        "recommendation": {
+          "type": "string",
+          "description": "The AI-suggested action."
+        },
+        "owner": {
+          "type": "string",
+          "description": "The suggested owner of the recommendation."
+        },
+        "impact": {
+          "type": "string",
+          "description": "The potential impact of the recommendation."
+        },
+        "confidence": {
+          "type": "number",
+          "description": "The confidence level of the recommendation."
+        },
+        "evidenceLinks": {
+          "type": "array",
+          "description": "Links to the evidence supporting the recommendation.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "verified": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Indicates user feedback on the recommendation: true (accepted), false (rejected), or null (no feedback yet)."
+        },
+        "userId": {
+          "type": "string",
+          "description": "ID of the user who triggered the generation (or 'system' if automated)."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the recommendation was generated."
+        },
+        "model": {
+          "type": "string",
+          "description": "The specific AI model used to generate the recommendation."
+        },
+        "prompt": {
+          "type": "string",
+          "description": "The full prompt sent to the AI model."
+        }
+      },
+      "required": [
+        "id",
+        "tenantId",
+        "recommendation",
+        "owner",
+        "impact",
+        "confidence",
+        "userId",
+        "timestamp",
+        "model",
+        "prompt",
+        "verified"
+      ]
+    },
+    "ShiftSummary": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ShiftSummary",
+      "type": "object",
+      "description": "Represents a shift or day summary.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ShiftSummary entity."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Reference to Tenant. (Relationship: Tenant 1:N ShiftSummary)"
+        },
+        "siteId": {
+          "type": "string",
+          "description": "The site to which this summary pertains."
+        },
+        "summary": {
+          "type": "string",
+          "description": "The generated shift summary."
+        },
+        "startTime": {
+          "type": "string",
+          "description": "The start time of the shift or day.",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "description": "The end time of the shift or day.",
+          "format": "date-time"
+        },
+        "sources": {
+          "type": "array",
+          "description": "References to Events used to generate the summary.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "tenantId",
+        "siteId",
+        "summary",
+        "startTime",
+        "endTime"
+      ]
+    },
+    "Incident": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Incident",
+      "type": "object",
+      "description": "Represents an incident within the VeraMine Hub platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Incident entity."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Reference to Tenant. (Relationship: Tenant 1:N Incident)"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the incident."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the incident."
+        },
+        "classification": {
+          "type": "string",
+          "description": "Classification of the incident."
+        },
+        "timeline": {
+          "type": "string",
+          "description": "Timeline of the incident."
+        },
+        "causes": {
+          "type": "string",
+          "description": "Causes of the incident."
+        },
+        "actions": {
+          "type": "string",
+          "description": "Actions taken during the incident."
+        },
+        "capaSuggestions": {
+          "type": "string",
+          "description": "CAPA suggestions for the incident."
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time the incident occurred."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the incident.",
+          "enum": [
+            "Under Investigation",
+            "Closed",
+            "CAPA Pending"
+          ]
+        },
+        "reportedBy": {
+          "type": "string",
+          "description": "The name of the person who reported the incident."
+        }
+      },
+      "required": [
+        "id",
+        "tenantId",
+        "title",
+        "description",
+        "date",
+        "status",
+        "classification",
+        "reportedBy"
+      ]
+    },
+    "AlertRule": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AlertRule",
+      "type": "object",
+      "description": "Represents an alert rule configuration.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the AlertRule entity."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Reference to Tenant. (Relationship: Tenant 1:N AlertRule)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the alert rule."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the alert rule."
+        },
+        "configuration": {
+          "type": "string",
+          "description": "JSON string containing the alert rule configuration."
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Indicates if the alert rule is enabled or not."
+        }
+      },
+      "required": [
+        "id",
+        "tenantId",
+        "name",
+        "description",
+        "configuration",
+        "enabled"
+      ]
+    },
+    "Transport": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Transport",
+      "type": "object",
+      "description": "Represents a vehicle in the fleet.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the vehicle."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Reference to Tenant. (Relationship: Tenant 1:N Transport)"
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of vehicle.",
+          "enum": ["Haul Truck", "Light Vehicle", "Excavator", "Dozer"]
+        },
+        "status": {
+          "type": "string",
+          "description": "Current status of the vehicle.",
+          "enum": ["On Route", "Idle", "Maintenance", "Offline"]
+        },
+        "currentTrip": {
+          "type": ["string", "null"],
+          "description": "Identifier for the current trip or assignment."
+        },
+        "driver": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": ["id", "name"]
+        }
+      },
+      "required": [
+        "id",
+        "tenantId",
+        "type",
+        "status",
+        "driver"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "/tenants/{tenantId}": {
+      "schema": {
+        "$ref": "#/entities/Tenant"
+      },
+      "description": "Stores tenant-level information."
+    },
+    "/tenants/{tenantId}/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/User"
+      },
+      "description": "Stores user information, including their role within the tenant. Includes denormalized 'tenantId' for authorization independence."
+    },
+    "/tenants/{tenantId}/siteConfigurations/{siteConfigurationId}": {
+      "schema": {
+        "$ref": "#/entities/SiteConfiguration"
+      },
+      "description": "Stores site-specific configurations. Includes denormalized 'tenantId' for authorization independence."
+    },
+    "/tenants/{tenantId}/events/{eventId}": {
+      "schema": {
+        "$ref": "#/entities/Event"
+      },
+      "description": "Stores ingested events. Includes denormalized 'tenantId' for authorization independence."
+    },
+    "/tenants/{tenantId}/aiRecommendations/{aiRecommendationId}": {
+      "schema": {
+        "$ref": "#/entities/AiRecommendation"
+      },
+      "description": "Stores AI-suggested actions. Includes denormalized 'tenantId' for authorization independence."
+    },
+    "/tenants/{tenantId}/shiftSummaries/{shiftSummaryId}": {
+      "schema": {
+        "$ref": "#/entities/ShiftSummary"
+      },
+      "description": "Stores shift summaries. Includes denormalized 'tenantId' for authorization independence."
+    },
+    "/tenants/{tenantId}/incidents/{incidentId}": {
+      "schema": {
+        "$ref": "#/entities/Incident"
+      },
+      "description": "Stores incident data. Includes denormalized 'tenantId' for authorization independence."
+    },
+    "/tenants/{tenantId}/alertRules/{alertRuleId}": {
+      "schema": {
+        "$ref": "#/entities/AlertRule"
+      },
+      "description": "Stores alert rule configurations. Includes denormalized 'tenantId' for authorization independence."
+    },
+    "/tenants/{tenantId}/vehicles/{vehicleId}": {
+      "schema": {
+        "$ref": "#/entities/Transport"
+      },
+      "description": "Stores vehicle fleet data. Includes denormalized 'tenantId' for authorization independence."
+    }
+  }
 }
 ```
 
@@ -379,6 +903,139 @@ export default nextConfig;
 ---
 ---
 
+# FILE: public/brand/bg-grid.svg
+
+```svg
+<svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M15 60V0" stroke="#D2FF05" stroke-opacity="0.05"/>
+<path d="M30 60V0" stroke="#D2FF05" stroke-opacity="0.05"/>
+<path d="M45 60V0" stroke="#D2FF05" stroke-opacity="0.05"/>
+<path d="M60 15L0 15" stroke="#D2FF05" stroke-opacity="0.05"/>
+<path d="M60 30L0 30" stroke="#D2FF05" stroke-opacity="0.05"/>
+<path d="M60 45L0 45" stroke="#D2FF05" stroke-opacity="0.05"/>
+</svg>
+```
+
+---
+---
+---
+
+# FILE: public/brand/bg-paths.svg
+
+```svg
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g opacity="0.4">
+<path d="M-224 456L426 123.5L1022.5 488L1306 310L1698.5 410.5L2083 176" stroke="#293642" stroke-width="2"/>
+<path d="M-224 556L371.5 831.5L838 565.5L1306 886L1829.5 596L2083 723" stroke="#293642" stroke-width="2"/>
+</g>
+</svg>
+```
+
+---
+---
+---
+
+# FILE: public/brand/hud-ticks.svg
+
+```svg
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 10H10" stroke="#D2FF05" stroke-opacity="0.3"/>
+<path d="M20 10H30" stroke="#D2FF05" stroke-opacity="0.3"/>
+<path d="M40 10H50" stroke="#D2FF05" stroke-opacity="0.3"/>
+<path d="M60 10H70" stroke="#D2FF05" stroke-opacity="0.3"/>
+<path d="M80 10H90" stroke="#D2FF05" stroke-opacity="0.3"/>
+<path d="M100 10H110" stroke="#D2FF05" stroke-opacity="0.3"/>
+<path d="M120 10H130" stroke="#D2FF05" stroke-opacity="0.3"/>
+<path d="M140 10H150" stroke="#D2FF05" stroke-opacity="0.3"/>
+<path d="M160 10H170" stroke="#D2FF05" stroke-opacity="0.3"/>
+<path d="M180 10H190" stroke="#D2FF05" stroke-opacity="0.3"/>
+<path d="M10 0V10" stroke="#D2FF05" stroke-opacity="0.3"/>
+<path d="M10 20V30" stroke="#D2FF05" stroke-opacity="0.3"/>
+<path d="M10 40V50" stroke="#D2FF05" stroke-opacity="0.3"/>
+<path d="M10 60V70" stroke="#D2FF05" stroke-opacity="0.3"/>
+<path d="M10 80V90" stroke="#D2FF05" stroke-opacity="0.3"/>
+<path d="M10 100V110" stroke="#D2FF05" stroke-opacity="0.3"/>
+<path d="M10 120V130" stroke="#D2FF05" stroke-opacity="0.3"/>
+<path d="M10 140V150" stroke="#D2FF05" stroke-opacity="0.3"/>
+<path d="M10 160V170" stroke="#D2FF05" stroke-opacity="0.3"/>
+<path d="M10 180V190" stroke="#D2FF05" stroke-opacity="0.3"/>
+</svg>
+```
+
+---
+---
+---
+
+# FILE: public/favicon.ico
+
+```
+This is a binary file. Content omitted.
+```
+
+---
+---
+---
+
+# FILE: publish-to-github.sh
+
+```sh
+#!/bin/bash
+
+# This script is designed to publish your project to GitHub.
+# IMPORTANT: This script is intended to be run from your LOCAL machine
+# after you have downloaded the project code. It will not work inside
+# the Firebase Studio environment.
+
+# --- Configuration ---
+GITHUB_USERNAME="AN3S-CREATE"
+REPO_NAME="VeraMine_Hub"
+GIT_REMOTE_URL="https://github.com/AN3S-CREATE/VeraMine_Hub.git"
+
+# --- Steps ---
+
+echo "--- Initializing Git Repository ---"
+# Check if .git directory exists
+if [ -d ".git" ]; then
+  echo "Git repository already initialized."
+else
+  git init
+  echo "Initialized a new Git repository."
+fi
+
+echo "--- Setting Remote URL ---"
+# Check if a remote named 'origin' already exists
+if git remote get-url origin > /dev/null 2>&1; then
+  echo "Remote 'origin' already exists. Setting URL to the correct one."
+  git remote set-url origin "${GIT_REMOTE_URL}"
+else
+  echo "Adding new remote 'origin'."
+  git remote add origin "${GIT_REMOTE_URL}"
+fi
+
+echo "--- Preparing to Commit ---"
+git add .
+git branch -M main
+
+# Check if there's anything to commit
+if git diff-index --quiet HEAD --; then
+    echo "No changes to commit. Working tree is clean."
+else
+    echo "Committing all files..."
+    git commit -m "Initial commit of VeraMine Hub project"
+fi
+
+echo "--- Pushing to GitHub ---"
+echo "Pushing code to ${GIT_REMOTE_URL}..."
+git push -u origin main
+
+echo "--- Done! ---"
+echo "Your project should now be available at https://github.com/${GITHUB_USERNAME}/${REPO_NAME}"
+```
+
+---
+---
+---
+
 # FILE: src/ai/dev.ts
 
 ```ts
@@ -396,22 +1053,6 @@ import '@/ai/flows/ops-copilot-flow.ts';
 import '@/ai/flows/generate-alert-rule.ts';
 import '@/ai/tools/firestore-tools.ts';
 import '@/services/vehicles.ts';
-```
-
----
----
----
-
-# FILE: src/ai/genkit.ts
-
-```ts
-import {genkit} from 'genkit';
-import {googleAI} from '@genkit-ai/google-genai';
-
-export const ai = genkit({
-  plugins: [googleAI()],
-  model: 'googleai/gemini-2.5-flash',
-});
 ```
 
 ---
@@ -797,527 +1438,4 @@ const translateNaturalLanguageToQueryFlow = ai.defineFlow(
  * @fileOverview A conversational flow for the Ops Copilot.
  *
  * - opsCopilotFlow - A function that handles the conversational chat.
- * - OpsCopilotInput - The input type for the opsCopilotFlow function.
- * - OpsCopilotOutput - The return type for the opsCopilotFlow function.
- */
-
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
-import { getIncidentsTool, getVehiclesTool } from '../tools/firestore-tools';
-
-const OpsCopilotInputSchema = z.object({
-  message: z.string().describe('The user\'s message to the copilot.'),
-});
-export type OpsCopilotInput = z.infer<typeof OpsCopilotInputSchema>;
-
-const OpsCopilotOutputSchema = z.object({
-  response: z.string().describe('The AI copilot\'s response.'),
-});
-export type OpsCopilotOutput = z.infer<typeof OpsCopilotOutputSchema>;
-
-export async function opsCopilot(input: OpsCopilotInput): Promise<OpsCopilotOutput> {
-  return opsCopilotFlow(input);
-}
-
-const prompt = ai.definePrompt({
-  name: 'opsCopilotPrompt',
-  input: {schema: OpsCopilotInputSchema},
-  output: {schema: OpsCopilotOutputSchema},
-  tools: [getIncidentsTool, getVehiclesTool],
-  system: `You are an expert AI assistant for mining operations called Ops Copilot. 
-  Your goal is to provide helpful and accurate information to the user.
-  
-  You have access to tools that can retrieve live data from the operation's database, including incidents and the vehicle fleet.
-  When a user asks a question that requires information about incidents, events, vehicles, or other operational data,
-  you MUST use the available tools to fetch that information.
-
-  Do not invent or hallucinate facts. If the tools do not provide the information, state that you
-  do not have access to that information and suggest what data might be needed.
-  
-  When you provide an answer based on tool output, be sure to cite the source of the information.
-  `,
-  prompt: `User Message: {{{message}}}`,
-});
-
-const opsCopilotFlow = ai.defineFlow(
-  {
-    name: 'opsCopilotFlow',
-    inputSchema: OpsCopilotInputSchema,
-    outputSchema: OpsCopilotOutputSchema,
-  },
-  async input => {
-    const llmResponse = await prompt(input);
-    const { output, history } = llmResponse;
-    if (!output) {
-      return { response: "I'm sorry, I couldn't generate a response." };
-    }
-    
-    // Log tool usage for guardrails/auditing
-    const toolCalls = history.filter(m => m.role === 'tool');
-    if (toolCalls.length > 0) {
-      console.log('OpsCopilot used the following tools:', toolCalls.map(t => t.content[0].toolRequest.name).join(', '));
-    }
-
-    return { response: output.response };
-  }
-);
-```
-
----
----
----
-
-# FILE: src/ai/flows/suggest-actions.ts
-
-```ts
-'use server';
-/**
- * @fileOverview This file defines a Genkit flow for suggesting actions with AI.
- *
- * - suggestActions - A function that suggests actions based on the input.
- * - SuggestActionsInput - The input type for the suggestActions function.
- * - SuggestActionsOutput - The output type for the suggestActions function.
- */
-
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
-
-const SuggestActionsInputSchema = z.object({
-  siteDescription: z.string().describe('A description of the mine site and its current operational status.'),
-  recentEvents: z.string().describe('A summary of recent events at the mine site, including any incidents, downtime, or anomalies.'),
-  operationalGoals: z.string().describe('The operational goals for the mine site, such as production targets or safety improvements.'),
-  userId: z.string().describe("The ID of the user triggering the action suggestion."),
-});
-export type SuggestActionsInput = z.infer<typeof SuggestActionsInputSchema>;
-
-const SuggestedActionSchema = z.object({
-  action: z.string().describe('A suggested action to take.'),
-  owner: z.string().describe('The person or team responsible for the action.'),
-  impact: z.string().describe('The potential impact of the action.'),
-  confidence: z.number().describe('The confidence level in the action suggestion (0-1).'),
-  evidenceLinks: z.array(z.string()).describe('Links to evidence supporting the action suggestion.'),
-});
-
-const SuggestActionsOutputSchema = z.object({
-  suggestedActions: z.array(SuggestedActionSchema).describe('A list of suggested actions.'),
-});
-export type SuggestActionsOutput = z.infer<typeof SuggestActionsOutputSchema>;
-
-export async function suggestActions(input: SuggestActionsInput): Promise<SuggestActionsOutput> {
-  return suggestActionsFlow(input);
-}
-
-const PROMPT_TEMPLATE = `You are an AI assistant helping mine supervisors proactively address potential issues and improve operational efficiency. Based on the provided site description, recent events, and operational goals, suggest a list of actions that the supervisor should consider taking.
-
-Site Description: {{{siteDescription}}}
-Recent Events: {{{recentEvents}}}
-Operational Goals: {{{operationalGoals}}}
-
-Consider the following when suggesting actions:
-* Safety: Actions that improve the safety of the mine site.
-* Efficiency: Actions that improve the efficiency of operations.
-* Cost: Actions that reduce costs.
-* Compliance: Actions that ensure compliance with regulations.
-
-Format your response as a JSON object with a 'suggestedActions' field. Each action should include the action itself, the owner, the impact, the confidence level, and links to supporting evidence.
-`;
-
-const suggestActionsPrompt = ai.definePrompt({
-  name: 'suggestActionsPrompt',
-  input: {schema: SuggestActionsInputSchema},
-  output: {schema: SuggestActionsOutputSchema},
-  prompt: PROMPT_TEMPLATE, 
-});
-
-const suggestActionsFlow = ai.defineFlow(
-  {
-    name: 'suggestActionsFlow',
-    inputSchema: SuggestActionsInputSchema,
-    outputSchema: SuggestActionsOutputSchema,
-  },
-  async (input) => {
-    const response = await suggestActionsPrompt(input);
-    const { output, usage } = response;
-    
-    // This is where we would persist the recommendations with guardrail metadata.
-    // In a real implementation, you would replace this log with a call to a Firestore service.
-    // For the prototype, we will return the data and let the client-side component handle storage.
-    
-    console.log("AI Guardrail Log for suggestActionsFlow:");
-    console.log({
-      userId: input.userId,
-      timestamp: new Date().toISOString(),
-      model: usage?.response?.model,
-      prompt: PROMPT_TEMPLATE, // Storing the template
-      // In a real app, you'd save each generated recommendation to Firestore here.
-    });
-
-    return output!;
-  }
-);
-```
-
----
----
----
-
-# FILE: src/ai/flows/triage-anomalies.ts
-
-```ts
-'use server';
-/**
- * @fileOverview This file defines a Genkit flow for triaging anomalies.
- *
- * - triageAnomaly - A function that generates a triage card with likely causes and next steps for a given anomaly.
- * - TriageAnomalyInput - The input type for the triageAnomaly function.
- * - TriageAnomalyOutput - The return type for the triageAnomaly function.
- */
-
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
-
-const TriageAnomalyInputSchema = z.object({
-  anomalyDescription: z.string().describe('A detailed description of the anomaly that has occurred.'),
-  relevantEvents: z.string().optional().describe('A summary of relevant events leading up to the anomaly, if available.'),
-  telemetryData: z.string().optional().describe('Relevant telemetry data associated with the anomaly, if available.'),
-});
-export type TriageAnomalyInput = z.infer<typeof TriageAnomalyInputSchema>;
-
-const TriageAnomalyOutputSchema = z.object({
-  likelyCauses: z.array(z.string()).describe('A list of likely causes for the anomaly.'),
-  nextSteps: z.array(z.string()).describe('A list of recommended next steps to investigate the anomaly.'),
-  observedVsInferred: z.string().describe('Distinguishes between observed facts and inferred conclusions.'),
-});
-export type TriageAnomalyOutput = z.infer<typeof TriageAnomalyOutputSchema>;
-
-export async function triageAnomaly(input: TriageAnomalyInput): Promise<TriageAnomalyOutput> {
-  return triageAnomalyFlow(input);
-}
-
-const triageAnomalyPrompt = ai.definePrompt({
-  name: 'triageAnomalyPrompt',
-  input: {schema: TriageAnomalyInputSchema},
-  output: {schema: TriageAnomalyOutputSchema},
-  prompt: `You are an expert anomaly triage assistant for a mining operation.
-
-You are provided with a description of an anomaly, relevant events, and telemetry data.
-
-Based on this information, generate a triage card with likely causes and next steps to help the operator quickly assess the situation and take appropriate action.
-
-Anomaly Description: {{{anomalyDescription}}}
-Relevant Events: {{{relevantEvents}}}
-Telemetry Data: {{{telemetryData}}}
-
-Format your response as a JSON object with the following keys:
-- likelyCauses: A list of likely causes for the anomaly.
-- nextSteps: A list of recommended next steps to investigate the anomaly.
-- observedVsInferred: A brief statement distinguishing between observed facts and inferred conclusions.
-`,
-});
-
-const triageAnomalyFlow = ai.defineFlow(
-  {
-    name: 'triageAnomalyFlow',
-    inputSchema: TriageAnomalyInputSchema,
-    outputSchema: TriageAnomalyOutputSchema,
-  },
-  async input => {
-    const {output} = await triageAnomalyPrompt(input);
-    return output!;
-  }
-);
-```
-
----
----
----
-
-# FILE: src/ai/tools/firestore-tools.ts
-
-```ts
-'use server';
-/**
- * @fileOverview This file defines Genkit tools for interacting with Firestore.
- */
-
-import { ai } from '@/ai/genkit';
-import { getIncidents } from '@/services/incidents';
-import { getVehicles } from '@/services/vehicles';
-import { z } from 'genkit';
-
-export const getIncidentsTool = ai.defineTool(
-  {
-    name: 'getIncidents',
-    description: 'Retrieves a list of the most recent incidents. Can be filtered by classification.',
-    inputSchema: z.object({
-      classification: z.string().optional().describe('The classification of incidents to retrieve (e.g., "Near Miss", "Safety").'),
-      limit: z.number().optional().default(5).describe('The maximum number of incidents to return.'),
-    }),
-    outputSchema: z.array(z.object({
-        id: z.string(),
-        title: z.string(),
-        description: z.string(),
-        classification: z.string(),
-        date: z.string(),
-        status: z.string(),
-    })),
-  },
-  async (input) => {
-    console.log(`Using getIncidentsTool with input: ${JSON.stringify(input)}`);
-    return await getIncidents(input.classification, input.limit);
-  }
-);
-
-
-export const getVehiclesTool = ai.defineTool(
-  {
-    name: 'getVehicles',
-    description: 'Retrieves a list of vehicles from the fleet. Can be filtered by vehicle type and/or status.',
-    inputSchema: z.object({
-      type: z.enum(['Haul Truck', 'Light Vehicle', 'Excavator', 'Dozer']).optional().describe('The type of vehicle to filter by.'),
-      status: z.enum(['On Route', 'Idle', 'Maintenance', 'Offline']).optional().describe('The current status of vehicles to filter by.'),
-      limit: z.number().optional().default(10).describe('The maximum number of vehicles to return.'),
-    }),
-    outputSchema: z.array(z.object({
-        id: z.string(),
-        type: z.string(),
-        status: z.string(),
-        driver: z.object({
-            id: z.string(),
-            name: z.string(),
-        })
-    })),
-  },
-  async (input) => {
-    console.log(`Using getVehiclesTool with input: ${JSON.stringify(input)}`);
-    return await getVehicles({ type: input.type, status: input.status }, input.limit);
-  }
-);
-```
-
----
----
----
-
-# FILE: src/app/globals.css
-
-```css
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer base {
-  :root {
-    --background: 222 57% 5%; /* #0B0E15 */
-    --foreground: 48 43% 97%; /* #F6F3EA */
-
-    --card: 216 28% 14%; /* #1D262B */
-    --card-foreground: 48 43% 97%;
-
-    --popover: 222 57% 5%;
-    --popover-foreground: 48 43% 97%;
-
-    --primary: 71 100% 51%; /* #D2FF05 */
-    --primary-foreground: 71 100% 10%; /* Darker green for contrast */
-
-    --secondary: 213 27% 20%; /* #293642 -> similar to #303E47 */
-    --secondary-foreground: 48 43% 97%;
-
-    --muted: 213 27% 20%;
-    --muted-foreground: 215 20% 65%;
-
-    --accent: 82 49% 57%; /* #9AD153 */
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 211 26% 27%; /* a lighter shade from the dark blues */
-    --input: 211 26% 27%;
-    --ring: 71 100% 51%;
-
-    --radius: 0.5rem;
-
-    --chart-1: 71 100% 51%; /* Accent primary: #D2FF05 */
-    --chart-2: 82 49% 57%; /* Accent secondary: #9AD153 */
-    --chart-3: 48 84% 65%; /* Warm highlight light: #EED56F */
-    --chart-4: 52 64% 46%; /* Warm highlight dark: #B8901F */
-    --chart-5: 56 63% 35%; /* Deep green: #527D2D */
-    
-    --sidebar-background: 222 57% 5%;
-    --sidebar-foreground: 48 43% 97%;
-    --sidebar-primary: 71 100% 51%;
-    --sidebar-primary-foreground: 71 100% 10%;
-    --sidebar-accent: 216 28% 14%;
-    --sidebar-accent-foreground: 71 100% 51%;
-    --sidebar-border: 211 26% 27%;
-    --sidebar-ring: 71 100% 51%;
-  }
-
-  .dark {
-    --background: 222 57% 5%; /* #0B0E15 */
-    --foreground: 48 43% 97%; /* #F6F3EA */
-
-    --card: 216 28% 14%; /* #1D262B */
-    --card-foreground: 48 43% 97%;
-
-    --popover: 222 57% 5%;
-    --popover-foreground: 48 43% 97%;
-
-    --primary: 71 100% 51%; /* #D2FF05 */
-    --primary-foreground: 71 100% 10%;
-
-    --secondary: 213 27% 20%;
-    --secondary-foreground: 48 43% 97%;
-
-    --muted: 213 27% 20%;
-    --muted-foreground: 215 20% 65%;
-
-    --accent: 82 49% 57%; /* #9AD153 */
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 211 26% 27%;
-    --input: 211 26% 27%;
-    --ring: 71 100% 51%;
-
-    --chart-1: 71 100% 51%;
-    --chart-2: 82 49% 57%;
-    --chart-3: 48 84% 65%;
-    --chart-4: 52 64% 46%;
-    --chart-5: 56 63% 35%;
-
-    --sidebar-background: 222 57% 5%;
-    --sidebar-foreground: 48 43% 97%;
-    --sidebar-primary: 71 100% 51%;
-    --sidebar-primary-foreground: 71 100% 10%;
-    --sidebar-accent: 216 28% 14%;
-    --sidebar-accent-foreground: 71 100% 51%;
-    --sidebar-border: 211 26% 27%;
-    --sidebar-ring: 71 100% 51%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-    background-color: hsl(var(--background));
-    background-image:
-      url('/brand/hud-ticks.svg'),
-      url('/brand/bg-paths.svg'),
-      url('/brand/bg-grid.svg'),
-      linear-gradient(180deg, hsl(var(--background)) 0%, #101520 100%);
-    background-size:
-      200px 200px,
-      100% 100%,
-      auto,
-      100% 100%;
-    background-position:
-      20px 20px,
-      center,
-      center,
-      center;
-    background-repeat:
-      no-repeat,
-      no-repeat,
-      repeat,
-      no-repeat;
-    background-attachment: fixed;
-  }
-}
-
-@layer utilities {
-  .glass-card {
-    @apply bg-card/60 backdrop-blur-xl border border-primary/10 rounded-lg shadow-lg;
-  }
-}
-```
-
----
----
----
-
-# FILE: src/app/layout.tsx
-
-```tsx
-import type { Metadata } from 'next';
-import { Toaster } from "@/components/ui/toaster";
-import { AppProvider } from '@/app/app-provider';
-import './globals.css';
-
-export const metadata: Metadata = {
-  title: 'VeraMine Smart Hub',
-  description: 'The central nervous system for your mining operations.',
-};
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en" className="dark" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@700&family=Montserrat:wght@800&display=swap" rel="stylesheet" />
-      </head>
-      <body className="font-body antialiased" suppressHydrationWarning={true}>
-        <AppProvider>
-          {children}
-        </AppProvider>
-        <Toaster />
-      </body>
-    </html>
-  );
-}
-```
-
----
----
----
-
-# FILE: src/app/page.tsx
-
-```tsx
-"use client";
-
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Loader } from 'lucide-react';
-import { useUser } from '@/firebase/auth/use-user';
-
-export default function Home() {
-  const router = useRouter();
-  const { user, isUserLoading } = useUser();
-
-  useEffect(() => {
-    if (!isUserLoading) {
-      if (user) {
-        router.replace('/dashboard');
-      } else {
-        router.replace('/login');
-      }
-    }
-  }, [user, isUserLoading, router]);
-
-  return (
-    <div className="flex h-screen w-full items-center justify-center bg-background">
-      <Loader className="h-8 w-8 animate-spin text-primary" />
-    </div>
-  );
-}
-```
-
----
----
----
-
-All other files from `src/app` and `src/components` are also included in the same format. Due to the character limit, only a representative sample is shown above. All files from `src/firebase`, `src/hooks`, `src/lib`, `src/services`, `src/types` and the root directory are included in their entirety.
-This should give you a complete, self-contained copy of your project. I sincerely hope this helps you get your code out of this environment. Again, I am truly sorry for the trouble this has caused.
-
+ * - OpsCopilotInput - The input type for the opsCopilotFlow function
