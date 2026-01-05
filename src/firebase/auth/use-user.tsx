@@ -5,6 +5,7 @@ import { onAuthStateChanged, type User as FirebaseAuthUser } from 'firebase/auth
 import { doc, onSnapshot } from 'firebase/firestore';
 import { useAuth, useFirestore, useMemoFirebase } from '@/firebase';
 import type { User as AppUser } from '@/types/user';
+import { MOCK_USERS } from '@/lib/mock-users';
 
 export interface UseUserResult {
   user: (AppUser & { uid: string }) | null;
@@ -24,6 +25,21 @@ export function useUser(): UseUserResult {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
+    // Check for Mock Mode via local storage (set by Playwright)
+    // We check this first to bypass Firebase auth entirely if needed for screenshots
+    // ONLY ENABLE IN DEVELOPMENT
+    if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
+        const mockRole = localStorage.getItem('MOCK_ROLE');
+        if (mockRole && MOCK_USERS[mockRole as keyof typeof MOCK_USERS]) {
+            // @ts-ignore
+            setFirebaseUser({ uid: MOCK_USERS[mockRole as keyof typeof MOCK_USERS].uid } as FirebaseAuthUser);
+            // @ts-ignore
+            setProfile(MOCK_USERS[mockRole as keyof typeof MOCK_USERS]);
+            setIsLoading(false);
+            return;
+        }
+    }
+
     if (!auth) {
       setIsLoading(false);
       return;
