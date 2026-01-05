@@ -78,6 +78,7 @@ export function useUser(): UseUserResult {
           if (firebaseUser?.isAnonymous) {
             setProfile({
               id: firebaseUser.uid,
+              tenantId: MOCK_TENANT_ID,
               email: 'guest@veramine.com',
               displayName: 'Guest User',
               role: 'viewer',
@@ -88,6 +89,7 @@ export function useUser(): UseUserResult {
              // For demo purposes, create a temporary profile if one doesn't exist
              setProfile({
                 id: firebaseUser?.uid || '',
+                tenantId: MOCK_TENANT_ID,
                 email: firebaseUser?.email || '',
                 displayName: firebaseUser?.displayName || 'Demo User',
                 role: 'admin', // Default to admin for demo ease
