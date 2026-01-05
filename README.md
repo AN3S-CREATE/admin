@@ -55,13 +55,13 @@ This section details every implemented feature, including the primary files and 
 | Feature | Description | Key Files & Modules |
 | :--- | :--- | :--- |
 | **Ops Copilot** | Conversational AI chat assistant. Uses tools to fetch live data. | `src/components/copilot/copilot-panel.tsx`, `src/ai/flows/ops-copilot-flow.ts`, `src/ai/tools/firestore-tools.ts` |
-| **AI-Suggested Actions** | Dashboard card suggesting actions based on operational data. | `src/components/dashboard/recommended-actions.tsx`, `src/ai/flows/suggest-actions.ts` |
+| **AI-Suggested Actions** | Dashboard card suggesting actions based on operational data. All suggestions and their guardrail metadata (user, timestamp, model) are persisted to Firestore. | `src/components/dashboard/recommended-actions.tsx`, `src/ai/flows/suggest-actions.ts` |
 | **Anomaly Triage** | AI analysis of a simulated anomaly event. | `src/components/dashboard/anomaly-triage-card.tsx`, `src/ai/flows/triage-anomalies.ts` |
 | **AI Incident Drafting**| Auto-fills an incident report from a free-text description. | `src/components/risk/incident-form.tsx`, `src/ai/flows/draft-incident-report.ts` |
 | **AI Report Narrative**| Generates an executive summary for reports on demand. | `src/app/dashboard/reports/production/page.tsx`, `src/app/dashboard/reports/safety/page.tsx`, `src/ai/flows/generate-report-narrative.ts`|
 | **NLQ Search** | Translates natural language into structured query JSON in the header search bar. | `src/components/layout/app-header.tsx`, `src/ai/flows/natural-language-to-query.ts` |
 | **AI Alert Rule Generation** | Creates structured alert rule JSON from a plain-text description. | `src/components/alerts/alert-rule-generator.tsx`, `src/ai/flows/generate-alert-rule.ts` |
-| **Shift Summary Generation**| Generates a shift summary from mock event data. | `src/components/operations/shift-summary-generator.tsx`, `src/ai/flows/generate-shift-summary.ts` |
+| **Shift Summary Generation**| Generates a shift summary from mock event data and saves it to Firestore. | `src/components/operations/shift-summary-generator.tsx`, `src/ai/flows/generate-shift-summary.ts` |
 
 ---
 
