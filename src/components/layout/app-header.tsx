@@ -100,7 +100,7 @@ export function AppHeader() {
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Natural Language to Insights..."
+              placeholder="Ask for a report: 'downtime last 7 days'..."
               className="w-full rounded-lg bg-muted pl-8 md:w-[200px] lg:w-[320px] font-sans"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
