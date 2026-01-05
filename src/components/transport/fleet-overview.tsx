@@ -1,18 +1,34 @@
 'use client';
 
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { MoreHorizontal, Truck, Shovel, Construction } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
+import { MoreHorizontal, Truck, Shovel, Construction, Trash2 } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '../ui/dropdown-menu';
 import { Button } from '../ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Skeleton } from '../ui/skeleton';
 import type { Vehicle } from '@/types/transport';
+import { useFirestore } from '@/firebase';
+import { doc } from 'firebase/firestore';
+import { deleteDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 type FleetOverviewProps = {
   vehicles: Vehicle[];
   isLoading: boolean;
+  onEdit: (vehicle: Vehicle) => void;
 };
 
 const statusColors: Record<Vehicle['status'], string> = {
@@ -29,8 +45,27 @@ const vehicleTypeIcons: Record<Vehicle['type'], React.ElementType> = {
     'Dozer': Construction,
 };
 
-export function FleetOverview({ vehicles, isLoading }: FleetOverviewProps) {
+const MOCK_TENANT_ID = 'VeraMine';
+
+export function FleetOverview({ vehicles, isLoading, onEdit }: FleetOverviewProps) {
+  const firestore = useFirestore();
+  const { toast } = useToast();
+  const [vehicleToDelete, setVehicleToDelete] = useState<Vehicle | null>(null);
+
+  const handleDelete = () => {
+    if (!firestore || !vehicleToDelete) return;
+    const vehicleDocRef = doc(firestore, 'tenants', MOCK_TENANT_ID, 'vehicles', vehicleToDelete.id);
+    deleteDocumentNonBlocking(vehicleDocRef);
+    toast({
+        title: 'Vehicle Deleted',
+        description: `Vehicle ${vehicleToDelete.id} has been removed from the fleet.`,
+    });
+    setVehicleToDelete(null);
+  };
+
+
   return (
+    <>
     <Card className="glass-card">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
@@ -46,7 +81,6 @@ export function FleetOverview({ vehicles, isLoading }: FleetOverviewProps) {
               <TableHead>Vehicle ID</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Current Trip/Assignment</TableHead>
               <TableHead>Driver</TableHead>
               <TableHead>
                 <span className="sr-only">Actions</span>
@@ -60,14 +94,13 @@ export function FleetOverview({ vehicles, isLoading }: FleetOverviewProps) {
                   <TableCell><Skeleton className="h-5 w-24" /></TableCell>
                   <TableCell><Skeleton className="h-5 w-20" /></TableCell>
                   <TableCell><Skeleton className="h-6 w-28" /></TableCell>
-                  <TableCell><Skeleton className="h-5 w-40" /></TableCell>
                   <TableCell><Skeleton className="h-8 w-24" /></TableCell>
                   <TableCell><Skeleton className="h-8 w-8" /></TableCell>
                 </TableRow>
               ))
             ) : vehicles.length === 0 ? (
                 <TableRow>
-                    <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                    <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
                         No vehicles found.
                     </TableCell>
                 </TableRow>
@@ -88,7 +121,6 @@ export function FleetOverview({ vehicles, isLoading }: FleetOverviewProps) {
                         {vehicle.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-muted-foreground">{vehicle.currentTrip || 'N/A'}</TableCell>
                     <TableCell>
                         <div className="flex items-center gap-2">
                           <Avatar className="h-8 w-8">
@@ -106,9 +138,17 @@ export function FleetOverview({ vehicles, isLoading }: FleetOverviewProps) {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>View Live Location</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onEdit(vehicle)}>Edit Vehicle</DropdownMenuItem>
                           <DropdownMenuItem>Assign New Trip</DropdownMenuItem>
                           <DropdownMenuItem>Schedule Maintenance</DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem 
+                            className="text-destructive"
+                            onClick={() => setVehicleToDelete(vehicle)}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete Vehicle
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -120,5 +160,24 @@ export function FleetOverview({ vehicles, isLoading }: FleetOverviewProps) {
         </Table>
       </CardContent>
     </Card>
+
+    <AlertDialog open={!!vehicleToDelete} onOpenChange={(open) => !open && setVehicleToDelete(null)}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This action cannot be undone. This will permanently delete vehicle 
+            <span className="font-bold"> "{vehicleToDelete?.id}"</span> from the fleet.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+            Delete
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }
