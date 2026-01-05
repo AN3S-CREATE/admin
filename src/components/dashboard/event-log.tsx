@@ -1,14 +1,17 @@
 'use client';
 
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '../ui/skeleton';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection, query, orderBy, limit } from 'firebase/firestore';
+import { collection, query, orderBy, limit, where } from 'firebase/firestore';
 import { formatDistanceToNow } from 'date-fns';
 import { Activity, ClipboardPaste, ShieldAlert, TimerOff } from 'lucide-react';
 import type { Event } from '@/types/event';
+import { Button } from '../ui/button';
+import { cn } from '@/lib/utils';
 
 const MOCK_TENANT_ID = 'VeraMine'; // As defined in use-user.tsx
 
@@ -19,26 +22,59 @@ const eventTypeConfig: Record<string, { icon: React.ElementType; color: string; 
     default: { icon: Activity, color: 'text-primary' },
 };
 
+const eventTypes = ['downtime', 'incident', 'handover'];
+
 
 export function EventLog() {
   const firestore = useFirestore();
+  const [filter, setFilter] = useState<string | null>(null);
 
   const eventsColRef = useMemoFirebase(() => {
     if (!firestore) return null;
     const baseRef = collection(firestore, 'tenants', MOCK_TENANT_ID, 'events');
-    return query(baseRef, orderBy('timestamp', 'desc'), limit(10));
-  }, [firestore]);
+    
+    const queries = [orderBy('timestamp', 'desc'), limit(15)];
+    if (filter) {
+      queries.unshift(where('eventType', '==', filter));
+    }
+    
+    return query(baseRef, ...queries);
+  }, [firestore, filter]);
 
   const { data: events, isLoading } = useCollection<Event>(eventsColRef);
 
   return (
     <Card className="glass-card">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-            <Activity className="h-6 w-6" />
-            Live Event Log
-        </CardTitle>
-        <CardDescription>A real-time stream of the latest events across the operation.</CardDescription>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex-1">
+                <CardTitle className="flex items-center gap-2">
+                    <Activity className="h-6 w-6" />
+                    Live Event Log
+                </CardTitle>
+                <CardDescription>A real-time stream of the latest events across the operation.</CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+                <Button 
+                    variant={!filter ? "default" : "outline"} 
+                    size="sm"
+                    onClick={() => setFilter(null)}
+                >
+                    All
+                </Button>
+                {eventTypes.map(type => (
+                    <Button 
+                        key={type}
+                        variant={filter === type ? "default" : "outline"} 
+                        size="sm"
+                        onClick={() => setFilter(type)}
+                        className="capitalize"
+                    >
+                        {type}
+                    </Button>
+                ))}
+            </div>
+        </div>
       </CardHeader>
       <CardContent>
         <Table>
@@ -63,7 +99,7 @@ export function EventLog() {
             ) : !events || events.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
-                  No events to display.
+                  No {filter ? `${filter} ` : ''}events to display.
                 </TableCell>
               </TableRow>
             ) : (
