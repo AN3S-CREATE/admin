@@ -14,13 +14,13 @@ export default function OperationsPage() {
         description="Shift handover, downtime capture, and operational KPIs."
       />
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-1 space-y-8">
-          <ShiftHandover />
-          <DowntimeCapture />
-        </div>
         <div className="lg:col-span-2 space-y-8">
           <KpiBoard />
           <ShiftSummaryGenerator />
+        </div>
+        <div className="lg:col-span-1 space-y-8">
+          <ShiftHandover />
+          <DowntimeCapture />
         </div>
       </div>
     </div>

@@ -79,21 +79,23 @@ export function ShiftSummaryGenerator() {
         <Card className="glass-card">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                    <FileText className="h-6 w-6" />
-                    Auto-Generate Shift Summary
+                    <Wand2 className="h-6 w-6 text-primary" />
+                    AI-Powered Shift Summary
                 </CardTitle>
                 <CardDescription>
-                    Use AI to automatically generate a summary for the last shift based on logged events.
+                    Automatically generate a summary for the last shift based on logged events and downtime.
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 <Button onClick={handleGenerateSummary} disabled={isGenerating} className="w-full font-bold">
-                    {isGenerating ? <Loader2 className="animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
-                    Generate Last Shift Summary
+                    {isGenerating ? <Loader2 className="animate-spin" /> : 'Generate Last Shift Summary'}
                 </Button>
                 {generatedSummary && (
                     <div className="space-y-2 pt-4 border-t border-border mt-4">
-                        <h3 className="font-semibold">Generated Summary:</h3>
+                        <h3 className="font-semibold flex items-center gap-2">
+                            <FileText className="h-4 w-4" />
+                            Generated Summary
+                        </h3>
                         <p className="text-sm text-muted-foreground p-4 bg-muted rounded-md whitespace-pre-wrap">
                             {generatedSummary}
                         </p>
