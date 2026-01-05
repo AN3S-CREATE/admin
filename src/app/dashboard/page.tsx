@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 import { recommendedActionsData } from '@/lib/mock-data';
 import { EventLog } from "@/components/dashboard/event-log";
 import { Activity, AlertTriangle, ArrowUp, Truck } from "lucide-react";
+import { AnomalyTriageCard } from "@/components/dashboard/anomaly-triage-card";
 
 const containerVariants = {
   hidden: { opacity: 1 },
@@ -93,9 +94,10 @@ export default function DashboardPage() {
           <DowntimeChart />
         </div>
 
-        {/* Right Column: Actions */}
-        <div className="lg:col-span-3">
+        {/* Right Column: Actions & Triage */}
+        <div className="lg:col-span-3 space-y-8">
           <RecommendedActions actions={recommendedActionsData} />
+          <AnomalyTriageCard />
         </div>
       </div>
       <EventLog />
