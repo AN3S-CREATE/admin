@@ -10,7 +10,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import { getIncidentsTool } from '../tools/firestore-tools';
+import { getIncidentsTool, getVehiclesTool } from '../tools/firestore-tools';
 
 const OpsCopilotInputSchema = z.object({
   message: z.string().describe('The user\'s message to the copilot.'),
@@ -30,12 +30,12 @@ const prompt = ai.definePrompt({
   name: 'opsCopilotPrompt',
   input: {schema: OpsCopilotInputSchema},
   output: {schema: OpsCopilotOutputSchema},
-  tools: [getIncidentsTool],
+  tools: [getIncidentsTool, getVehiclesTool],
   system: `You are an expert AI assistant for mining operations called Ops Copilot. 
   Your goal is to provide helpful and accurate information to the user.
   
-  You have access to tools that can retrieve live data from the operation's database.
-  When a user asks a question that requires information about incidents, events, or other operational data,
+  You have access to tools that can retrieve live data from the operation's database, including incidents and the vehicle fleet.
+  When a user asks a question that requires information about incidents, events, vehicles, or other operational data,
   you MUST use the available tools to fetch that information.
 
   Do not invent or hallucinate facts. If the tools do not provide the information, state that you
