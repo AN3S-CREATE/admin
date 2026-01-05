@@ -53,8 +53,8 @@ export function IncidentList({ incidents, isLoading }: IncidentListProps) {
                     </div>
                   </div>
                 </AccordionTrigger>
-                <AccordionContent className="px-4 pt-2 pb-4 text-muted-foreground space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                <AccordionContent className="px-4 pt-2 pb-4 text-muted-foreground space-y-4 bg-muted/20 border-l-2 border-primary/20">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm pt-4">
                     <div>
                       <p className="font-semibold text-foreground mb-1">Reported By</p>
                       <p>{incident.reportedBy} on {format(parseISO(incident.date), 'dd MMM yyyy, HH:mm')}</p>
