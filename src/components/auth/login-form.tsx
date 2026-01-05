@@ -22,6 +22,8 @@ export function LoginForm() {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const { user, isUserLoading } = useUser();
 
+  const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+
   useEffect(() => {
     if (!isUserLoading && user) {
       router.replace('/dashboard');
@@ -104,15 +106,19 @@ export function LoginForm() {
           <Button type="submit" className="w-full font-bold" disabled={isLoading}>
             {isLoading ? <Loader2 className="animate-spin" /> : 'Sign In'}
           </Button>
-          <div className="relative w-full">
-            <Separator className="absolute left-0 top-1/2 -translate-y-1/2" />
-            <p className="text-center text-xs text-muted-foreground bg-card px-2 relative">
-              DEMO LOGIN
-            </p>
-          </div>
-          <Button variant="outline" type="button" className="w-full" onClick={handleDemoLogin} disabled={isLoading}>
-             {isLoading ? <Loader2 className="animate-spin" /> : 'Continue as Guest'}
-          </Button>
+          {isDemoMode && (
+            <>
+              <div className="relative w-full">
+                <Separator className="absolute left-0 top-1/2 -translate-y-1/2" />
+                <p className="text-center text-xs text-muted-foreground bg-card px-2 relative">
+                  DEMO LOGIN
+                </p>
+              </div>
+              <Button variant="outline" type="button" className="w-full" onClick={handleDemoLogin} disabled={isLoading}>
+                 {isLoading ? <Loader2 className="animate-spin" /> : 'Continue as Guest'}
+              </Button>
+            </>
+          )}
         </CardFooter>
       </form>
     </Card>
