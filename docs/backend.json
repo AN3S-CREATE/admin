@@ -150,8 +150,9 @@
           "description": "The user or system that generated the event."
         },
         "payload": {
-          "type": "string",
-          "description": "A JSON string representing the event payload, which varies by eventType."
+          "type": "object",
+          "description": "A structured object representing the event payload, which varies by eventType. For example, a 'downtime' event might have { assetId: 'string', duration: 'number' }.",
+          "additionalProperties": true
         }
       },
       "required": [
@@ -235,7 +236,8 @@
         "userId",
         "timestamp",
         "model",
-        "prompt"
+        "prompt",
+        "verified"
       ]
     },
     "ShiftSummary": {
@@ -395,7 +397,8 @@
         "tenantId",
         "name",
         "description",
-        "configuration"
+        "configuration",
+        "enabled"
       ]
     },
     "Transport": {
@@ -511,5 +514,3 @@
     }
   }
 }
-
-    
