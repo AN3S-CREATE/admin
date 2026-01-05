@@ -8,10 +8,10 @@
  */
 
 import {ai} from '@/ai/genkit';
-import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import {z} from 'genkit';
 import { initializeFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
-import {z} from 'genkit';
+import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
 const MOCK_TENANT_ID = 'VeraMine';
 
@@ -71,30 +71,30 @@ const suggestActionsFlow = ai.defineFlow(
   async (input) => {
     const { firestore } = initializeFirebase();
     const recommendationsColRef = collection(firestore, 'tenants', MOCK_TENANT_ID, 'aiRecommendations');
-
-    const response = await suggestActionsPrompt(input);
-    const { output, usage, history } = response;
-
-    if (output?.suggestedActions) {
-      for (const action of output.suggestedActions) {
-        const recommendationToStore = {
-          tenantId: MOCK_TENANT_ID,
-          recommendation: action.action,
-          owner: action.owner,
-          impact: action.impact,
-          confidence: action.confidence,
-          evidenceLinks: action.evidenceLinks,
-          verified: null, // Initialize as unverified
-          userId: input.userId,
-          timestamp: new Date().toISOString(),
-          model: usage?.response?.model || 'unknown',
-          prompt: PROMPT_TEMPLATE,
-        };
-        // Persist each recommendation without blocking
-        addDocumentNonBlocking(recommendationsColRef, recommendationToStore);
-      }
-    }
     
+    const response = await suggestActionsPrompt(input);
+    const { output, usage } = response;
+    
+    if (output?.suggestedActions) {
+        for (const action of output.suggestedActions) {
+            const recommendationToStore = {
+                tenantId: MOCK_TENANT_ID,
+                recommendation: action.action,
+                owner: action.owner,
+                impact: action.impact,
+                confidence: action.confidence,
+                evidenceLinks: action.evidenceLinks,
+                verified: null, // Recommendations start as unverified.
+                userId: input.userId,
+                timestamp: new Date().toISOString(),
+                model: usage?.response?.model || 'unknown',
+                prompt: PROMPT_TEMPLATE,
+            };
+            // Persist each recommendation without blocking
+            addDocumentNonBlocking(recommendationsColRef, recommendationToStore);
+        }
+    }
+
     return output!;
   }
 );

@@ -229,7 +229,7 @@ The application follows a modern, server-enhanced web architecture based on Next
 
 ---
 
-## 7. Testing & QA
+## 7. Testing & Quality Assurance
 
 -   **Security Rules Testing**: The primary testing mechanism for security is the real-time feedback loop created by the `FirestorePermissionError` system. During development, any action that violates a rule immediately throws a detailed error in the browser overlay, showing the exact request context that was denied. This allows for rapid, iterative testing of the security rules.
 -   **Static Analysis**: `typescript` and `eslint` are used for static type checking and linting to catch errors before runtime. `tsc --noEmit` can be run to check for type errors.
@@ -245,7 +245,7 @@ The application follows a modern, server-enhanced web architecture based on Next
 -   **Authorization (Data Access)**: The most critical security feature. Handled entirely by `firestore.rules`.
     -   **Tenant Isolation**: All rules are predicated on a `isTenantMember(tenantId)` check, which verifies that the authenticated user belongs to the tenant whose data is being accessed. This prevents any cross-tenant data leakage.
     -   **Role-Based Access Control (RBAC)**: Write permissions are granted based on the user's role (e.g., `admin`, `ops`) stored in their Firestore profile, using the `canWriteInTenant(tenantId)` function. `viewer` roles are implicitly read-only.
--   **Audit Logging**: The AI flows (`suggest-actions.ts`, `ops-copilot-flow.ts`) contain `console.log` statements that serve as placeholders for a structured audit trail. In a production environment, these would be replaced with writes to a dedicated, secured Firestore collection to log every AI decision, the prompt used, and the user who triggered it.
+-   **Audit Logging**: The AI flows (`suggest-actions.ts`, `ops-copilot-flow.ts`) are designed to support a structured audit trail. The `suggestActionsFlow`, for example, now persists every recommendation to Firestore, including the user who triggered it, the timestamp, and the model used.
 -   **Client-Side Security**: The application disallows critical operations from the client. For example, tenant creation/deletion and user creation (invites only create a pending document) are restricted by security rules, assuming they would be handled by a trusted backend process.
 
 ---
