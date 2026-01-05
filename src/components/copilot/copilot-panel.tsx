@@ -18,7 +18,7 @@ type Message = {
 const initialMessages: Message[] = [
   {
     role: 'assistant',
-    content: "Welcome to the Ops Copilot. How can I help you today? You can ask things like, \"What changed since the last shift?\" or \"Show me all high-priority incidents this week.\"",
+    content: "Welcome to the Ops Copilot. I'm a conversational AI assistant. Right now, I'm not connected to your live operational data, but you can ask me general questions or for help with analysis. How can I assist you today?",
   },
 ];
 
