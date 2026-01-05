@@ -14,19 +14,20 @@ const SuggestActionsInputSchema = z.object({
   siteDescription: z.string().describe('A description of the mine site and its current operational status.'),
   recentEvents: z.string().describe('A summary of recent events at the mine site, including any incidents, downtime, or anomalies.'),
   operationalGoals: z.string().describe('The operational goals for the mine site, such as production targets or safety improvements.'),
+  userId: z.string().describe("The ID of the user triggering the action suggestion."),
 });
 export type SuggestActionsInput = z.infer<typeof SuggestActionsInputSchema>;
 
+const SuggestedActionSchema = z.object({
+  action: z.string().describe('A suggested action to take.'),
+  owner: z.string().describe('The person or team responsible for the action.'),
+  impact: z.string().describe('The potential impact of the action.'),
+  confidence: z.number().describe('The confidence level in the action suggestion (0-1).'),
+  evidenceLinks: z.array(z.string()).describe('Links to evidence supporting the action suggestion.'),
+});
+
 const SuggestActionsOutputSchema = z.object({
-  suggestedActions: z.array(
-    z.object({
-      action: z.string().describe('A suggested action to take.'),
-      owner: z.string().describe('The person or team responsible for the action.'),
-      impact: z.string().describe('The potential impact of the action.'),
-      confidence: z.number().describe('The confidence level in the action suggestion (0-1).'),
-      evidenceLinks: z.array(z.string()).describe('Links to evidence supporting the action suggestion.'),
-    })
-  ).describe('A list of suggested actions.'),
+  suggestedActions: z.array(SuggestedActionSchema).describe('A list of suggested actions.'),
 });
 export type SuggestActionsOutput = z.infer<typeof SuggestActionsOutputSchema>;
 
@@ -34,11 +35,7 @@ export async function suggestActions(input: SuggestActionsInput): Promise<Sugges
   return suggestActionsFlow(input);
 }
 
-const suggestActionsPrompt = ai.definePrompt({
-  name: 'suggestActionsPrompt',
-  input: {schema: SuggestActionsInputSchema},
-  output: {schema: SuggestActionsOutputSchema},
-  prompt: `You are an AI assistant helping mine supervisors proactively address potential issues and improve operational efficiency. Based on the provided site description, recent events, and operational goals, suggest a list of actions that the supervisor should consider taking.
+const PROMPT_TEMPLATE = `You are an AI assistant helping mine supervisors proactively address potential issues and improve operational efficiency. Based on the provided site description, recent events, and operational goals, suggest a list of actions that the supervisor should consider taking.
 
 Site Description: {{{siteDescription}}}
 Recent Events: {{{recentEvents}}}
@@ -51,7 +48,13 @@ Consider the following when suggesting actions:
 * Compliance: Actions that ensure compliance with regulations.
 
 Format your response as a JSON object with a 'suggestedActions' field. Each action should include the action itself, the owner, the impact, the confidence level, and links to supporting evidence.
-`, 
+`;
+
+const suggestActionsPrompt = ai.definePrompt({
+  name: 'suggestActionsPrompt',
+  input: {schema: SuggestActionsInputSchema},
+  output: {schema: SuggestActionsOutputSchema},
+  prompt: PROMPT_TEMPLATE, 
 });
 
 const suggestActionsFlow = ai.defineFlow(
@@ -60,8 +63,23 @@ const suggestActionsFlow = ai.defineFlow(
     inputSchema: SuggestActionsInputSchema,
     outputSchema: SuggestActionsOutputSchema,
   },
-  async input => {
-    const {output} = await suggestActionsPrompt(input);
+  async (input) => {
+    const response = await suggestActionsPrompt(input);
+    const { output, usage } = response;
+    
+    // This is where we would persist the recommendations with guardrail metadata.
+    // In a real implementation, you would replace this log with a call to a Firestore service.
+    // For the prototype, we will return the data and let the client-side component handle storage.
+    
+    console.log("AI Guardrail Log for suggestActionsFlow:");
+    console.log({
+      userId: input.userId,
+      timestamp: new Date().toISOString(),
+      model: usage?.response?.model,
+      prompt: PROMPT_TEMPLATE, // Storing the template
+      // In a real app, you'd save each generated recommendation to Firestore here.
+    });
+
     return output!;
   }
 );

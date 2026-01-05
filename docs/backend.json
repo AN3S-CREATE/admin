@@ -167,7 +167,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "AiRecommendation",
       "type": "object",
-      "description": "Represents an AI-suggested action.",
+      "description": "Represents an AI-suggested action with full audit trail.",
       "properties": {
         "id": {
           "type": "string",
@@ -183,11 +183,11 @@
         },
         "owner": {
           "type": "string",
-          "description": "The owner of the recommendation."
+          "description": "The suggested owner of the recommendation."
         },
         "impact": {
           "type": "string",
-          "description": "The impact of the recommendation."
+          "description": "The potential impact of the recommendation."
         },
         "confidence": {
           "type": "number",
@@ -200,9 +200,29 @@
             "type": "string"
           }
         },
-        "accepted": {
-          "type": "boolean",
-          "description": "Indicates if the recommendation was accepted or not."
+        "verified": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Indicates user feedback on the recommendation: true (accepted), false (rejected), or null (no feedback yet)."
+        },
+        "userId": {
+          "type": "string",
+          "description": "ID of the user who triggered the generation (or 'system' if automated)."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the recommendation was generated."
+        },
+        "model": {
+          "type": "string",
+          "description": "The specific AI model used to generate the recommendation."
+        },
+        "prompt": {
+          "type": "string",
+          "description": "The full prompt sent to the AI model."
         }
       },
       "required": [
@@ -211,7 +231,11 @@
         "recommendation",
         "owner",
         "impact",
-        "confidence"
+        "confidence",
+        "userId",
+        "timestamp",
+        "model",
+        "prompt"
       ]
     },
     "ShiftSummary": {
