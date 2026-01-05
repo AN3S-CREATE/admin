@@ -7,7 +7,7 @@ import { StatCard } from '@/components/dashboard/stat-card';
 import { ProductionChart } from '@/components/dashboard/production-chart';
 import { DowntimeChart } from '@/components/dashboard/downtime-chart';
 import { motion } from 'framer-motion';
-import { statCards, productionData, downtimeData } from '@/lib/mock-data';
+import { statCards, productionData } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import { Download, Wand2, Loader2, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';

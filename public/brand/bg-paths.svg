@@ -1,12 +1,5 @@
-<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style="stop-color:hsl(var(--primary) / 0.05);stop-opacity:1" />
-            <stop offset="100%" style="stop-color:hsl(var(--accent) / 0.05);stop-opacity:1" />
-        </linearGradient>
-    </defs>
-    <path d="M0,50 Q25,0 50,50 T100,50" stroke="url(#grad1)" stroke-width="1.5" fill="none" />
-    <path d="M0,80 Q20,120 40,80 T80,80 T120,100" stroke="url(#grad1)" stroke-width="1.5" fill="none" stroke-dasharray="4" />
-    <path d="M100,0 Q75,50 50,0 T0,0" stroke="url(#grad1)" stroke-width="1" fill="none" />
-    <path d="M20,100 Q40,60 60,100 T100,80" stroke="url(#grad1)" stroke-width="1" fill="none" stroke-dasharray="2" />
+<svg viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+  <path d="M-200 700.511C-136.216 673.411 -7.747 558.311 200.723 558.311C541.94 558.311 541.94 750 850.5 750C1159.06 750 1159.06 558.311 1500 558.311" fill="none" stroke="hsl(var(--primary))" stroke-width="1.5" stroke-opacity="0.06"/>
+  <path d="M-200 448.98C-142.793 459.34 28.18 507.02 153.643 513.68C322.015 522.82 529.5 423.5 850.5 423.5C1171.5 423.5 1358.59 515.68 1500 533.8" fill="none" stroke="hsl(var(--primary))" stroke-width="1.5" stroke-opacity="0.06"/>
+  <path d="M-200 200C191.5 200 183 850.5 850.5 850.5C1518 850.5 1308 200 1500 200" fill="none" stroke="hsl(var(--primary))" stroke-width="1.5" stroke-opacity="0.04"/>
 </svg>

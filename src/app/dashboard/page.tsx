@@ -96,7 +96,7 @@ export default function DashboardPage() {
 
         {/* Right Column: Actions & Triage */}
         <div className="lg:col-span-3 space-y-8">
-          <RecommendedActions actions={recommendedActionsData} />
+          <RecommendedActions />
           <AnomalyTriageCard />
         </div>
       </div>

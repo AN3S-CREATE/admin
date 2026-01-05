@@ -1,6 +1,6 @@
-<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
-  <path d="M 20 0 L 20 5 M 0 20 L 5 20" stroke="hsl(var(--primary) / 0.1)" stroke-width="1"/>
-  <path d="M 180 0 L 180 5 M 200 20 L 195 20" stroke="hsl(var(--primary) / 0.1)" stroke-width="1"/>
-  <path d="M 20 200 L 20 195 M 0 180 L 5 180" stroke="hsl(var(--primary) / 0.1)" stroke-width="1"/>
-  <path d="M 180 200 L 180 195 M 200 180 L 195 180" stroke="hsl(var(--primary) / 0.1)" stroke-width="1"/>
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M20 0V8" stroke="hsl(var(--primary))" stroke-opacity="0.1" stroke-width="1"/>
+<path d="M0 20H8" stroke="hsl(var(--primary))" stroke-opacity="0.1" stroke-width="1"/>
+<path d="M180 200V192" stroke="hsl(var(--primary))" stroke-opacity="0.1" stroke-width="1"/>
+<path d="M200 180H192" stroke="hsl(var(--primary))" stroke-opacity="0.1" stroke-width="1"/>
 </svg>
