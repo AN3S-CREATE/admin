@@ -1,0 +1,515 @@
+
+{
+  "entities": {
+    "Tenant": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Tenant",
+      "type": "object",
+      "description": "Represents a tenant within the VeraMine Hub multi-tenant platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Tenant entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the tenant."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of the tenant."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the tenant was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user within the VeraMine Hub platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity, matching Firebase Auth UID."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Reference to Tenant. (Relationship: Tenant 1:N User)"
+        },
+        "email": {
+          "type": "string",
+          "description": "User's email address.",
+          "format": "email"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User's display name."
+        },
+        "role": {
+          "type": "string",
+          "description": "The user's role within the tenant.",
+          "enum": [
+            "admin",
+            "ops",
+            "hr",
+            "safety",
+            "viewer"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the user account.",
+          "enum": [
+            "pending",
+            "active",
+            "disabled"
+          ]
+        },
+        "invitedAt": {
+          "type": "string",
+          "description": "Timestamp of when the user invitation was sent.",
+          "format": "date-time"
+        },
+        "joinedAt": {
+          "type": "string",
+          "description": "Timestamp of when the user first logged in.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "tenantId",
+        "email",
+        "role",
+        "status"
+      ]
+    },
+    "SiteConfiguration": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SiteConfiguration",
+      "type": "object",
+      "description": "Represents the configuration settings for a specific site within a tenant.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the SiteConfiguration entity."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Reference to Tenant. (Relationship: Tenant 1:N SiteConfiguration)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the site."
+        },
+        "settings": {
+          "type": "string",
+          "description": "JSON string containing site-specific settings."
+        }
+      },
+      "required": [
+        "id",
+        "tenantId",
+        "name",
+        "settings"
+      ]
+    },
+    "Event": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Event",
+      "type": "object",
+      "description": "Represents a unified event ingested into the system.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Event entity."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Reference to Tenant. (Relationship: Tenant 1:N Event)"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp of when the event occurred.",
+          "format": "date-time"
+        },
+        "eventType": {
+          "type": "string",
+          "description": "Type of the event (e.g., alarm, downtime, telemetry)."
+        },
+        "actor": {
+          "type": "string",
+          "description": "The user or system that generated the event."
+        },
+        "payload": {
+          "type": "string",
+          "description": "A JSON string representing the event payload, which varies by eventType."
+        }
+      },
+      "required": [
+        "id",
+        "tenantId",
+        "timestamp",
+        "eventType",
+        "payload",
+        "actor"
+      ]
+    },
+    "AiRecommendation": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AiRecommendation",
+      "type": "object",
+      "description": "Represents an AI-suggested action with full audit trail.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the AiRecommendation entity."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Reference to Tenant. (Relationship: Tenant 1:N AiRecommendation)"
+        },
+        "recommendation": {
+          "type": "string",
+          "description": "The AI-suggested action."
+        },
+        "owner": {
+          "type": "string",
+          "description": "The suggested owner of the recommendation."
+        },
+        "impact": {
+          "type": "string",
+          "description": "The potential impact of the recommendation."
+        },
+        "confidence": {
+          "type": "number",
+          "description": "The confidence level of the recommendation."
+        },
+        "evidenceLinks": {
+          "type": "array",
+          "description": "Links to the evidence supporting the recommendation.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "verified": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Indicates user feedback on the recommendation: true (accepted), false (rejected), or null (no feedback yet)."
+        },
+        "userId": {
+          "type": "string",
+          "description": "ID of the user who triggered the generation (or 'system' if automated)."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the recommendation was generated."
+        },
+        "model": {
+          "type": "string",
+          "description": "The specific AI model used to generate the recommendation."
+        },
+        "prompt": {
+          "type": "string",
+          "description": "The full prompt sent to the AI model."
+        }
+      },
+      "required": [
+        "id",
+        "tenantId",
+        "recommendation",
+        "owner",
+        "impact",
+        "confidence",
+        "userId",
+        "timestamp",
+        "model",
+        "prompt",
+        "verified"
+      ]
+    },
+    "ShiftSummary": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ShiftSummary",
+      "type": "object",
+      "description": "Represents a shift or day summary.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ShiftSummary entity."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Reference to Tenant. (Relationship: Tenant 1:N ShiftSummary)"
+        },
+        "siteId": {
+          "type": "string",
+          "description": "The site to which this summary pertains."
+        },
+        "summary": {
+          "type": "string",
+          "description": "The generated shift summary."
+        },
+        "startTime": {
+          "type": "string",
+          "description": "The start time of the shift or day.",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "description": "The end time of the shift or day.",
+          "format": "date-time"
+        },
+        "sources": {
+          "type": "array",
+          "description": "References to Events used to generate the summary.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "tenantId",
+        "siteId",
+        "summary",
+        "startTime",
+        "endTime"
+      ]
+    },
+    "Incident": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Incident",
+      "type": "object",
+      "description": "Represents an incident within the VeraMine Hub platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Incident entity."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Reference to Tenant. (Relationship: Tenant 1:N Incident)"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the incident."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the incident."
+        },
+        "classification": {
+          "type": "string",
+          "description": "Classification of the incident."
+        },
+        "timeline": {
+          "type": "string",
+          "description": "Timeline of the incident."
+        },
+        "causes": {
+          "type": "string",
+          "description": "Causes of the incident."
+        },
+        "actions": {
+          "type": "string",
+          "description": "Actions taken during the incident."
+        },
+        "capaSuggestions": {
+          "type": "string",
+          "description": "CAPA suggestions for the incident."
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time the incident occurred."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the incident.",
+          "enum": [
+            "Under Investigation",
+            "Closed",
+            "CAPA Pending"
+          ]
+        },
+        "reportedBy": {
+          "type": "string",
+          "description": "The name of the person who reported the incident."
+        }
+      },
+      "required": [
+        "id",
+        "tenantId",
+        "title",
+        "description",
+        "date",
+        "status",
+        "classification",
+        "reportedBy"
+      ]
+    },
+    "AlertRule": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AlertRule",
+      "type": "object",
+      "description": "Represents an alert rule configuration.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the AlertRule entity."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Reference to Tenant. (Relationship: Tenant 1:N AlertRule)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the alert rule."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the alert rule."
+        },
+        "configuration": {
+          "type": "string",
+          "description": "JSON string containing the alert rule configuration."
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Indicates if the alert rule is enabled or not."
+        }
+      },
+      "required": [
+        "id",
+        "tenantId",
+        "name",
+        "description",
+        "configuration",
+        "enabled"
+      ]
+    },
+    "Transport": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Transport",
+      "type": "object",
+      "description": "Represents a vehicle in the fleet.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the vehicle."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Reference to Tenant. (Relationship: Tenant 1:N Transport)"
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of vehicle.",
+          "enum": ["Haul Truck", "Light Vehicle", "Excavator", "Dozer"]
+        },
+        "status": {
+          "type": "string",
+          "description": "Current status of the vehicle.",
+          "enum": ["On Route", "Idle", "Maintenance", "Offline"]
+        },
+        "currentTrip": {
+          "type": ["string", "null"],
+          "description": "Identifier for the current trip or assignment."
+        },
+        "driver": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": ["id", "name"]
+        }
+      },
+      "required": [
+        "id",
+        "tenantId",
+        "type",
+        "status",
+        "driver"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "/tenants/{tenantId}": {
+      "schema": {
+        "$ref": "#/entities/Tenant"
+      },
+      "description": "Stores tenant-level information."
+    },
+    "/tenants/{tenantId}/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/User"
+      },
+      "description": "Stores user information, including their role within the tenant. Includes denormalized 'tenantId' for authorization independence."
+    },
+    "/tenants/{tenantId}/siteConfigurations/{siteConfigurationId}": {
+      "schema": {
+        "$ref": "#/entities/SiteConfiguration"
+      },
+      "description": "Stores site-specific configurations. Includes denormalized 'tenantId' for authorization independence."
+    },
+    "/tenants/{tenantId}/events/{eventId}": {
+      "schema": {
+        "$ref": "#/entities/Event"
+      },
+      "description": "Stores ingested events. Includes denormalized 'tenantId' for authorization independence."
+    },
+    "/tenants/{tenantId}/aiRecommendations/{aiRecommendationId}": {
+      "schema": {
+        "$ref": "#/entities/AiRecommendation"
+      },
+      "description": "Stores AI-suggested actions. Includes denormalized 'tenantId' for authorization independence."
+    },
+    "/tenants/{tenantId}/shiftSummaries/{shiftSummaryId}": {
+      "schema": {
+        "$ref": "#/entities/ShiftSummary"
+      },
+      "description": "Stores shift summaries. Includes denormalized 'tenantId' for authorization independence."
+    },
+    "/tenants/{tenantId}/incidents/{incidentId}": {
+      "schema": {
+        "$ref": "#/entities/Incident"
+      },
+      "description": "Stores incident data. Includes denormalized 'tenantId' for authorization independence."
+    },
+    "/tenants/{tenantId}/alertRules/{alertRuleId}": {
+      "schema": {
+        "$ref": "#/entities/AlertRule"
+      },
+      "description": "Stores alert rule configurations. Includes denormalized 'tenantId' for authorization independence."
+    },
+    "/tenants/{tenantId}/vehicles/{vehicleId}": {
+      "schema": {
+        "$ref": "#/entities/Transport"
+      },
+      "description": "Stores vehicle fleet data. Includes denormalized 'tenantId' for authorization independence."
+    }
+  }
+}

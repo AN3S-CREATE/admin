@@ -10,17 +10,7 @@ import { useCollection, useFirestore, useMemoFirebase, useUser, updateDocumentNo
 import { collection, query, where, limit, doc } from "firebase/firestore";
 import { Skeleton } from "../ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-
-// This type now includes the ID and the verification status
-export type AiRecommendation = {
-  id: string;
-  action: string;
-  owner: string;
-  impact: string;
-  confidence: number;
-  evidenceLinks: string[];
-  verified: boolean | null; // true for accepted, false for rejected, null for neutral
-}
+import type { AiRecommendation } from "@/types/ai-recommendation";
 
 const MOCK_TENANT_ID = 'VeraMine';
 
@@ -35,7 +25,7 @@ export function RecommendedActions() {
     if (!firestore) return null;
     const baseRef = collection(firestore, 'tenants', MOCK_TENANT_ID, 'aiRecommendations');
     // For now, we fetch any recommendations. In a real app, you might filter by `verified: null`.
-    return query(baseRef, limit(3));
+    return query(baseRef, limit(3), where('verified', '==', null));
   }, [firestore]);
 
   const { data: recommendations, isLoading } = useCollection<AiRecommendation>(recommendationsColRef);
@@ -96,7 +86,7 @@ export function RecommendedActions() {
           recommendations.map((item) => (
             <div key={item.id} className="flex flex-col gap-4 rounded-lg border border-border p-3 transition-colors hover:bg-muted/30">
               <div className="space-y-2">
-                <p className="font-semibold text-sm">{item.action}</p>
+                <p className="font-semibold text-sm">{item.recommendation}</p>
                 <div className="text-xs text-muted-foreground space-y-1">
                   <p><span className="font-medium text-foreground">Owner:</span> {item.owner}</p>
                   <p><span className="font-medium text-foreground">Impact:</span> {item.impact}</p>
