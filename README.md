@@ -1,166 +1,280 @@
-# VeraMine Hub: Application Overview
+# VeraMine Hub: Technical Engineering Report
 
-VeraMine Hub is a comprehensive, AI-powered operational management platform designed for the mining industry. It serves as a central nervous system, integrating real-time data from various operational silos into a single, intuitive interface. The platform provides executive dashboards, detailed module-specific pages, and powerful AI-driven tools to enhance safety, efficiency, and decision-making.
+**Version:** 1.0
+**Date:** 2024-07-29
 
-This document provides a detailed overview of the application's features, architecture, and technical implementation.
-
----
-
-## 1. All Features & Capabilities
-
-VeraMine Hub is organized into several key modules, each targeting a specific area of mining operations.
-
-### Core Modules & User-Facing Functions
-
-*   **Executive Dashboard:** A high-level, real-time view of the entire operation.
-    *   **KPI Stat Cards:** At-a-glance cards for key metrics like Overall Production, Equipment Uptime, Fleet Availability, and Active Alerts, with trend indicators.
-    *   **Production & Downtime Charts:** Visualizations of production output over time and a breakdown of downtime reasons.
-    *   **Live Event Log:** A real-time stream of significant events across the operation, filterable by type (e.g., downtime, incident, handover).
-
-*   **Smart Transport:** Fleet management and logistics.
-    *   **Fleet Overview:** A real-time table of all vehicles, showing their ID, type, status, and assigned driver.
-    *   **Vehicle Management:** A form to add new vehicles to the fleet or edit existing ones.
-
-*   **Smart Plant:** (Placeholder) Intended for visualizing plant telemetry, managing alarms, and viewing historical trend data.
-
-*   **Smart Operations:** Tools for shift and event management.
-    *   **Shift Handover:** A form for shift managers to submit crucial notes for the next shift.
-    *   **Downtime Capture:** A quick-capture form to log downtime events, including asset ID, duration, and reason.
-
-*   **Smart Risk:** Incident management and reporting.
-    *   **Incident Capture:** A form to log new safety or operational incidents and near-misses.
-    *   **Recent Incidents List:** An accordion-style list of all logged incidents, with detailed views.
-
-*   **Smart People:** Personnel management and compliance.
-    *   **People Profiles:** A list of all personnel, showing their role, status, and a mock compliance progress bar.
-
-*   **Smart Reporting:** A gallery of pre-built reports.
-    *   **Production Scorecard:** A detailed report with KPIs, charts, and an AI narrative generation feature.
-    *   **Safety Scorecard:** An incident-focused report, also featuring AI-generated narratives.
-
-*   **Smart Tracking & Integrations:** (Placeholders) Future modules for device tracking/geofencing and managing third-party data integrations.
-
-*   **Alerts Engine:** Configuration and monitoring of operational alerts.
-    *   **Alerts Inbox:** A real-time view of currently active alerts.
-    *   **Alert Rule List:** A table of all configured alert rules, with options to enable/disable or delete them.
-
-*   **Admin Console:** Tenant and user management.
-    *   **User Management:** A list of all users within the tenant, with their role and status.
-    *   **User Invitation:** A form for admins to invite new users to the platform.
-
-### AI-Powered & Automation Features
-
-VeraMine Hub leverages Google's AI (via Genkit) to provide intelligent assistance and automation throughout the application.
-
-*   **Ops Copilot:** A conversational AI assistant accessible from a slide-out panel. It can answer natural language questions about operational data by using tools to query the live database for information on incidents and vehicles.
-*   **AI-Suggested Actions (Dashboard):** An AI-powered card that analyzes recent operational data (mocked for prototype) to suggest proactive actions for supervisors, complete with confidence scores and evidence links. Users can provide feedback (thumbs up/down) to train the model.
-*   **Anomaly Triage Assistant (Dashboard):** An AI tool that takes a description of an anomaly and generates a "triage card" with likely causes, recommended next steps, and an analysis of observed vs. inferred facts.
-*   **AI-Drafted Incident Reports (Risk Module):** Users can describe an incident in free text, and the AI will automatically draft a structured report, classifying the incident and generating a timeline, likely causes, and corrective action (CAPA) suggestions.
-*   **AI-Generated Report Narratives (Reporting Module):** On the Production and Safety Scorecard pages, users can click a button to have an AI generate a concise, executive-level narrative summary of the report's key findings, impacts, and recommendations.
-*   **Natural Language to Query (Search Bar):** The main search bar can translate plain English queries (e.g., "downtime last 7 days") into a structured JSON query configuration, demonstrating a powerful analytics and reporting capability.
-*   **AI-Generated Alert Rules (Alerts Module):** Users can describe a desired alert in plain English (e.g., "Alert if pressure exceeds 150 PSI for 5 minutes"), and the AI will generate a formal rule name, JSON configuration, and a human-readable preview.
+This document provides a comprehensive, engineering-level technical overview of the VeraMine Hub application. It is intended for developers, architects, and technical stakeholders.
 
 ---
 
-## 2. Unique Selling Points & Advantages
+## 1. Full Feature Inventory
 
-*   **AI at the Core:** The app is not just a data viewer; it's an active participant in the operational workflow. AI is used to suggest, draft, analyze, and translate, turning raw data into actionable intelligence.
-*   **Real-Time & Reactive:** Built on Firebase's Firestore database, the UI is fully reactive. Changes made by one user (e.g., logging an incident, updating a vehicle's status) are reflected in near real-time for all other users without needing to refresh the page.
-*   **Production-Grade Architecture:**
-    *   **Multi-Tenant Security:** The entire data model and security rules are built around a strict multi-tenant architecture, ensuring that one tenant's data is completely isolated from another's.
-    *   **Non-Blocking UI:** The app uses an optimistic-update pattern for database writes. When a user submits a form, the UI provides immediate feedback while the data is sent to the database in the background. This makes the application feel extremely fast and responsive.
-    *   **Centralized Error Handling:** A custom, robust error handling system is in place specifically for Firestore security rule violations. It captures detailed context about the failed request and presents it in the Next.js development overlay, making it much easier to debug security rules.
-    *   **Scalable & Modern Tech:** Built on the Next.js App Router, React Server Components, and hosted on Firebase App Hosting for excellent performance and scalability.
+This section details every implemented feature, including the primary files and modules involved.
 
----
+### 1.1. Core Application & UI
 
-## 3. Files & Project Structure
+| Feature | Description | Key Files & Modules |
+| :--- | :--- | :--- |
+| **Root Layout** | Main HTML shell, font loading, global styles, and provider setup. | `src/app/layout.tsx`, `src/app/globals.css` |
+| **Authentication** | User login via Email/Password or Anonymous Guest mode. | `src/app/login/page.tsx`, `src/components/auth/login-form.tsx`, `src/firebase/auth/use-user.tsx` |
+| **Dashboard Layout** | Main application shell with persistent sidebar and header. | `src/app/dashboard/layout.tsx`, `src/components/layout/app-sidebar.tsx`, `src/components/layout/app-header.tsx` |
+| **Routing** | Handled by Next.js App Router. A root page redirects to login or dashboard. | `src/app/page.tsx` |
 
-The project is organized logically, separating UI components, application logic, AI flows, and configuration.
+### 1.2. Modules & Pages
 
-*   `src/app/`: The core of the application, containing all pages and layouts based on the Next.js App Router.
-    *   `src/app/dashboard/`: Contains the layout and individual pages for each module (e.g., `operations/page.tsx`, `risk/page.tsx`).
-    *   `src/app/layout.tsx`: The root layout of the application.
-*   `src/components/`: Contains all React components, organized by module or function.
-    *   `src/components/dashboard/`: Components specific to the main dashboard.
-    *   `src/components/risk/`: Components for the Risk module (e.g., `IncidentForm.tsx`).
-    *   `src/components/layout/`: App-wide layout components like the header and sidebar.
-    *   `src/components/ui/`: Reusable, low-level UI components from ShadCN (Button, Card, etc.).
-*   `src/ai/`: All Genkit-related AI logic.
-    *   `src/ai/flows/`: Contains all the individual AI flows (e.g., `ops-copilot-flow.ts`, `draft-incident-report.ts`). Each file defines the input/output schemas and the prompt for the LLM.
-    *   `src/ai/tools/`: Defines "tools" that the AI can use to interact with other parts of the system, like querying the database.
-    *   `src/ai/genkit.ts`: The central Genkit configuration file.
-*   `src/firebase/`: All Firebase-related setup and hooks.
-    *   `src/firebase/config.ts`: The client-side Firebase configuration object.
-    *   `src/firebase/provider.tsx`: The core React context provider for Firebase services.
-    *   `src/firebase/auth/use-user.tsx`: A custom hook for managing the currently authenticated user's state and profile.
-    *   `src/firebase/firestore/`: Custom hooks (`useCollection.tsx`, `useDoc.tsx`) for real-time data fetching.
-*   `src/services/`: Server-side functions designed to be called by AI tools to securely fetch data from Firestore (e.g., `incidents.ts`, `vehicles.ts`).
-*   `docs/`: Contains the data model definition and security rules blueprint.
-    *   `docs/backend.json`: A JSON file that serves as a blueprint for the application's data entities and Firestore structure.
-*   `firestore.rules`: The security rules for the Firestore database, enforcing the multi-tenant data isolation.
-*   `next.config.ts`, `tailwind.config.ts`, `tsconfig.json`: Standard Next.js and TypeScript project configuration files.
-*   `package.json`: Defines all project dependencies and scripts.
+| Module | Feature | Description | Key Files & Modules |
+| :--- | :--- | :--- | :--- |
+| **Executive Dashboard**| Main landing page with a high-level operational overview. | `src/app/dashboard/page.tsx` |
+| | KPI Stat Cards | Displays key metrics: Production, Uptime, Fleet Availability, Alerts. | `src/components/dashboard/stat-card.tsx` |
+| | Production Chart | Bar chart visualizing daily production output. | `src/components/dashboard/production-chart.tsx` |
+| | Downtime Chart | Pie chart breaking down downtime by reason code. | `src/components/dashboard/downtime-chart.tsx` |
+| | Live Event Log | Real-time, filterable log of system-wide events. | `src/components/dashboard/event-log.tsx` |
+| **Smart Transport** | Fleet management module. | `src/app/dashboard/transport/page.tsx` |
+| | Fleet Overview | Real-time list of all vehicles, their status, and drivers. | `src/components/transport/fleet-overview.tsx` |
+| | Vehicle Form | Add or edit vehicles in the fleet. Data is saved to Firestore. | `src/components/transport/vehicle-form.tsx` |
+| **Smart Operations**| Shift and event management. | `src/app/dashboard/operations/page.tsx` |
+| | Downtime Capture | Form to log equipment downtime events into Firestore. | `src/components/operations/downtime-capture.tsx` |
+| | Shift Handover | Form for submitting shift handover notes. | `src/components/operations/shift-handover.tsx` |
+| **Smart Risk** | Incident and risk management. | `src/app/dashboard/risk/page.tsx` |
+| | Incident List | Displays all incidents from Firestore in an accordion view. | `src/components/risk/incident-list.tsx` |
+| **Smart People** | Personnel overview. | `src/app/dashboard/people/page.tsx` |
+| | People List | Displays all users with role, status, and mock compliance data. | `src/components/people/people-list.tsx` |
+| **Smart Reporting** | Central hub for all reports. | `src/app/dashboard/reports/page.tsx` |
+| | Production Report | Detailed production scorecard page. | `src/app/dashboard/reports/production/page.tsx` |
+| | Safety Report | Detailed safety scorecard page. | `src/app/dashboard/reports/safety/page.tsx` |
+| **Alerts Engine** | Alert configuration and monitoring. | `src/app/dashboard/alerts/page.tsx` |
+| | Alerts Inbox | Displays active alerts based on enabled rules in Firestore. | `src/components/alerts/alerts-inbox.tsx` |
+| | Alert Rule List | Manages all alert rules, allowing enable/disable/delete. | `src/components/alerts/alert-rule-list.tsx` |
+| **Admin Console** | User and tenant administration. | `src/app/dashboard/admin/page.tsx` |
+| | User Management | Lists all users in the tenant with their roles and statuses. | `src/components/admin/user-list.tsx` |
+| | User Invitation | Form for admins to create new "pending" user records. | `src/components/admin/user-invite-form.tsx` |
+| **Placeholder Modules**| `Plant`, `Tracking`, `Integrations` | These pages are placeholders for future development. | `src/app/dashboard/{plant,tracking,integrations}/page.tsx` |
 
----
+### 1.3. AI-Powered Features (Genkit)
 
-## 4. How It Was Built (Architecture)
-
-*   **Frontend:** A Next.js 15 application using the App Router. Components are built with React 19 and TypeScript. Styling is handled by Tailwind CSS, with a component library provided by ShadCN UI.
-*   **Backend / AI:** Generative AI features are powered by **Firebase Genkit**. Genkit orchestrates calls to Google's AI models (Gemini) and defines the structured flows, tools, and prompts. These flows are exposed as server-side functions that the frontend can call.
-*   **Database:** **Cloud Firestore** is used as the primary NoSQL database. It's used in a real-time fashion, where the frontend subscribes to data changes, and the UI updates automatically.
-*   **Authentication:** **Firebase Authentication** handles user sign-in (Email/Password and Anonymous/Guest mode are configured). A custom React hook (`useUser`) combines the auth state with the user's profile from Firestore.
-*   **Cloud Logic:** While not using explicit Cloud Functions in this build, the Genkit flows and service functions are designed to run on a server-side environment, which Firebase App Hosting provides.
-
----
-
-## 5. Programming Languages & Technologies
-
-*   **Languages:** TypeScript (primarily), JavaScript, CSS, Handlebars (in Genkit prompts).
-*   **Frameworks/Libraries:**
-    *   **Next.js 15** / **React 19**: Core frontend framework.
-    *   **Genkit**: The framework for building AI-powered features.
-    *   **Firebase SDK (v11)**: For all interactions with Firestore and Firebase Auth.
-    *   **ShadCN UI** / **Radix UI**: For accessible, unstyled UI component primitives.
-    *   **Tailwind CSS**: For all styling.
-    *   **Zod**: For schema validation, especially in AI flow inputs/outputs.
-    *   **Lucide React**: For icons.
-    *   **Recharts**: For data visualization (charts).
-    *   **Framer Motion**: For UI animations.
+| Feature | Description | Key Files & Modules |
+| :--- | :--- | :--- |
+| **Ops Copilot** | Conversational AI chat assistant. Uses tools to fetch live data. | `src/components/copilot/copilot-panel.tsx`, `src/ai/flows/ops-copilot-flow.ts`, `src/ai/tools/firestore-tools.ts` |
+| **AI-Suggested Actions** | Dashboard card suggesting actions based on operational data. | `src/components/dashboard/recommended-actions.tsx`, `src/ai/flows/suggest-actions.ts` |
+| **Anomaly Triage** | AI analysis of a simulated anomaly event. | `src/components/dashboard/anomaly-triage-card.tsx`, `src/ai/flows/triage-anomalies.ts` |
+| **AI Incident Drafting**| Auto-fills an incident report from a free-text description. | `src/components/risk/incident-form.tsx`, `src/ai/flows/draft-incident-report.ts` |
+| **AI Report Narrative**| Generates an executive summary for reports on demand. | `src/app/dashboard/reports/production/page.tsx`, `src/app/dashboard/reports/safety/page.tsx`, `src/ai/flows/generate-report-narrative.ts`|
+| **NLQ Search** | Translates natural language into structured query JSON in the header search bar. | `src/components/layout/app-header.tsx`, `src/ai/flows/natural-language-to-query.ts` |
+| **AI Alert Rule Generation** | Creates structured alert rule JSON from a plain-text description. | `src/components/alerts/alert-rule-generator.tsx`, `src/ai/flows/generate-alert-rule.ts` |
+| **Shift Summary Generation**| Generates a shift summary from mock event data. | `src/components/operations/shift-summary-generator.tsx`, `src/ai/flows/generate-shift-summary.ts` |
 
 ---
 
-## 6. Deployment & Hosting
+## 2. Source Code Structure
 
-*   **Hosting:** The `apphosting.yaml` file configures the project for deployment on **Firebase App Hosting**, a managed Next.js hosting service that provides CI/CD, scalability, and integration with the Firebase ecosystem.
-*   **GitHub Integration:** A `publish-to-github.sh` script is included to facilitate pushing the codebase to a GitHub repository from a local machine, enabling standard version control and CI/CD workflows.
+```
+.
+├── docs/
+│   └── backend.json        # Data entity and Firestore path blueprint
+├── public/                 # Static assets (images, fonts, etc.)
+├── src/
+│   ├── ai/
+│   │   ├── flows/          # Genkit flows defining AI agent logic
+│   │   ├── tools/          # Genkit tools for AI to interact with services
+│   │   ├── dev.ts          # Main entry point for Genkit development server
+│   │   └── genkit.ts       # Genkit initialization and configuration
+│   ├── app/
+│   │   ├── (dashboard)/    # Main application pages
+│   │   ├── login/
+│   │   ├── app-provider.tsx
+│   │   ├── globals.css
+│   │   ├── layout.tsx      # Root layout
+│   │   └── page.tsx        # Root page (redirect logic)
+│   ├── components/
+│   │   ├── admin/
+│   │   ├── alerts/
+│   │   ├── auth/
+│   │   ├── copilot/
+│   │   ├── dashboard/
+│   │   ├── layout/
+│   │   ├── operations/
+│   │   ├── people/
+│   │   ├── reports/
+│   │   ├── risk/
+│   │   ├── shared/
+│   │   ├── transport/
+│   │   ├── ui/             # ShadCN UI components
+│   │   └── FirebaseErrorListener.tsx
+│   ├── firebase/
+│   │   ├── auth/
+│   │   │   └── use-user.tsx # Hook for getting current user and profile
+│   │   ├── firestore/
+│   │   │   ├── use-collection.tsx # Real-time collection hook
+│   │   │   └── use-doc.tsx      # Real-time document hook
+│   │   ├── client-provider.tsx # Client-side Firebase initializer
+│   │   ├── config.ts         # Firebase project configuration
+│   │   ├── error-emitter.ts  # Typed event emitter for global errors
+│   │   ├── errors.ts         # Custom FirestorePermissionError class
+│   │   ├── index.ts          # Barrel file for all Firebase exports
+│   │   ├── non-blocking-login.tsx
+│   │   ├── non-blocking-updates.tsx
+│   │   └── provider.tsx      # Core Firebase context provider
+│   ├── hooks/
+│   │   ├── use-alerts.ts
+│   │   ├── use-mobile.tsx
+│   │   └── use-toast.ts
+│   ├── lib/
+│   │   ├── mock-data.ts
+│   │   ├── placeholder-images.ts
+│   │   ├── placeholder-images.json
+│   │   └── utils.ts
+│   ├── services/
+│   │   ├── incidents.ts      # Server-side function for AI to get incidents
+│   │   └── vehicles.ts       # Server-side function for AI to get vehicles
+│   └── types/                # TypeScript type definitions for data models
+├── .env
+├── apphosting.yaml
+├── firestore.rules         # Firestore security rules
+├── next.config.ts
+├── package.json
+└── tsconfig.json
+```
 
 ---
 
-## 7. Testing & Quality Assurance
+## 3. Key Files and Their Roles
 
-*   **Security Testing:** The primary security model is enforced by `firestore.rules`. The custom `FirestorePermissionError` class and its corresponding listener component are a key part of the development and testing strategy, allowing developers to quickly identify and fix security rule denials during development.
-*   **Functional & Integration:** The application is built with distinct, testable components and modules. The use of server-side data-fetching functions (`/services`) and well-defined AI flows (`/ai/flows`) allows for isolated testing of backend logic.
-*   **Type Safety:** The entire codebase is written in TypeScript with `strict` mode enabled, ensuring a high degree of type safety and reducing runtime errors.
-
----
-
-## 8. Mobile & Offline Capabilities
-
-*   **Responsive Design:** The UI is fully responsive and designed to work across desktop, tablet, and mobile screen sizes.
-*   **Offline Data Persistence:** While not fully implemented as a PWA, the core architecture leverages Firestore's built-in offline persistence. This means that if a user loses their network connection, they can still view all previously loaded data and can even write new data (like logging an incident). Firestore automatically syncs these changes back to the server once the connection is restored. This is a powerful, production-grade feature that comes out-of-the-box with the chosen architecture.
-
----
-
-## 9. Security & Compliance
-
-*   **Tenant Data Isolation:** Enforced at the database level via `firestore.rules`. A user can *only* read or write data that belongs to their assigned `tenantId`.
-*   **Role-Based Access Control (RBAC):** Within a tenant, user permissions are governed by their role (e.g., `admin`, `viewer`). Admins have elevated privileges, while `viewer` roles are read-only for most data.
-*   **AI Guardrail Logging:** The AI flows (`suggest-actions.ts`, `ops-copilot-flow.ts`) include placeholder logic for audit logging. In a production scenario, every AI-generated suggestion, the prompt used, and the user who triggered it would be logged to a secure collection for audit and compliance purposes.
+- **`src/app/layout.tsx`**: Root layout for the entire application. Imports global CSS, fonts, and wraps children in the `AppProvider`.
+- **`src/app/app-provider.tsx`**: A client-side component that wraps the `FirebaseClientProvider`, ensuring Firebase is initialized only on the client.
+- **`src/firebase/index.ts`**: The central hub for Firebase functionality. It initializes the Firebase app and exports all necessary hooks (`useAuth`, `useFirestore`, `useUser`, `useCollection`) for use throughout the application.
+- **`src/firebase/provider.tsx`**: Defines the `FirebaseProvider` and the core `useFirebase` hook. It makes the Firebase `app`, `auth`, and `firestore` instances available to all child components via React Context. It also includes the `<FirebaseErrorListener />`.
+- **`src/firebase/auth/use-user.tsx`**: A critical custom hook that combines the Firebase Auth `onAuthStateChanged` listener with a real-time Firestore `onSnapshot` listener on the user's profile document. This provides a single, unified `user` object containing both auth state and application-specific profile data (like `role`).
+- **`src/firebase/non-blocking-updates.tsx`**: Contains utility functions (`setDocumentNonBlocking`, `addDocumentNonBlocking`, etc.) that perform Firestore write operations. Crucially, these functions do **not** `await` the promise, allowing the UI to remain responsive. Instead, they attach a `.catch()` block to handle and globally emit any security rule errors.
+- **`src/firebase/errors.ts` & `src/components/FirebaseErrorListener.tsx`**: These files form the contextual error handling system. `errors.ts` defines a custom `FirestorePermissionError` that captures rich context about a failed operation. `FirebaseErrorListener.tsx` is an invisible component that listens for these errors (via `error-emitter.ts`) and throws them, which are then caught by the Next.js error overlay for easy debugging.
+- **`src/ai/genkit.ts`**: Initializes and configures the Genkit instance, specifying the `googleAI` plugin. This is the entry point for all AI functionality.
+- **`src/ai/flows/*.ts`**: Each file defines a specific AI capability. It includes Zod schemas for strongly-typed inputs and outputs, and the Handlebars prompt template that instructs the LLM.
+- **`src/ai/tools/firestore-tools.ts`**: Defines functions (`getIncidentsTool`, `getVehiclesTool`) that are exposed to the AI as "tools." This allows the AI in `ops-copilot-flow.ts` to decide to call these functions to fetch live data from Firestore via the `src/services` functions.
+- **`docs/backend.json`**: A JSON Schema-based definition of all data entities (`User`, `Incident`, etc.) and their locations within the Firestore database. This file serves as a static blueprint and source of truth for the data model.
+- **`firestore.rules`**: The security policy for the database. It enforces strict tenant isolation (`isTenantMember`) and role-based access control (`canWriteInTenant`) for all data operations.
 
 ---
 
-## 10. Analytics & Monitoring
+## 4. Architecture Diagram & Explanation
 
-*   **Analytics:** While a dedicated analytics provider is not integrated, the structured nature of the `Event` collection in Firestore (`/tenants/{tenantId}/events/{eventId}`) provides a powerful foundation for building analytics dashboards. Events for downtime, incidents, and handovers are all captured in a consistent format.
-*   **Monitoring & Alerting:** The "Alerts Engine" module is designed for this purpose. It allows users to configure rules based on operational data, and the "Alerts Inbox" provides a real-time view of triggered alerts, forming the basis of a comprehensive monitoring system.
+The application follows a modern, server-enhanced web architecture based on Next.js and Firebase.
+
+**Diagram (ASCII):**
+
+```
++----------------+      +---------------------+      +---------------------+
+|   User/Browser | <--> |   Next.js Frontend  | <--> |  Genkit AI Flows    |
+| (React/ShadCN) |      | (React Server/Client|      | (Server-side Logic) |
++----------------+      |   Components)       |      +----------+----------+
+       |                +----------+----------+                 |
+       |                           | (RPC)                      | (Google AI API)
+       | (HTTPS/Auth)              |                            |
+       |                           |                            v
+       |                           |                      +-----------+
+       |                           |                      | Gemini LLM|
+       |                           |                      +-----------+
+       v                           v
++----------+----------+      +---------------------+
+| Firebase Services   |      |  Firestore Database |
+| (Auth, App Hosting) | <--> | (Data & Security    |
++---------------------+      |    Rules)           |
+                             +---------------------+
+```
+
+**Explanation:**
+
+1.  **Frontend (Client)**: The user interacts with a Next.js application built with React and ShadCN UI components. Most components are Client Components (`'use client'`) to allow for interactivity and hooks.
+2.  **Frontend (Server)**: Next.js renders pages on the server first for performance. The `app/` directory structure dictates the routes.
+3.  **Firebase Connection**: On the client, the app initializes a connection to Firebase. All data fetching is done in real-time using `useCollection` and `useDoc` hooks, which subscribe to Firestore snapshots. All data mutations are "non-blocking," providing an optimistic UI.
+4.  **Authentication**: Firebase Authentication handles user sign-in. The `useUser` hook listens for auth state changes and fetches the corresponding user profile from Firestore, creating a unified user context.
+5.  **Database & Security**: Firestore is the backend database. Security is not handled in application code but is **enforced directly by `firestore.rules`**. Every single read and write from the client is validated against these rules, ensuring tenant isolation and role-based permissions.
+6.  **AI Backend (Genkit)**: The AI features are not run in the browser. When a user triggers an AI feature, the frontend makes a server-side call (RPC) to a Genkit Flow.
+7.  **Genkit Flows**: These server-side TypeScript functions (`/src/ai/flows`) orchestrate the AI logic. They may call "tools" (`/src/ai/tools`) to fetch data from Firestore (via `/src/services`). They then construct a prompt and make an API call to the Google Gemini LLM. The structured response from the LLM is then returned to the frontend.
+
+---
+
+## 5. Programming Languages & Frameworks
+
+-   **Languages**:
+    -   **TypeScript**: Primary language for all frontend and backend logic.
+    -   **CSS**: Used for global styles and Tailwind CSS directives.
+    -   **Handlebars**: Used within Genkit prompt templates for variable substitution.
+    -   **Firestore Rules Language**: A specialized language for defining security rules.
+-   **Frameworks & Libraries**:
+    -   **Next.js 15**: Core web framework.
+    -   **React 19**: UI library.
+    -   **Genkit**: Framework for orchestrating AI flows.
+    -   **Firebase SDK (v11)**: Client-side SDK for Auth and Firestore.
+    -   **Tailwind CSS**: Utility-first CSS framework.
+    -   **ShadCN UI / Radix UI**: Unstyled, accessible UI component primitives.
+    -   **Zod**: Schema validation for AI flow inputs/outputs.
+    -   **Recharts**: Charting library for visualizations.
+    -   **Framer Motion**: For UI animations.
+    -   **Lucide React**: Icon library.
+
+---
+
+## 6. Build & Deployment Process
+
+-   **Build**: The application is built using the standard Next.js build process.
+    -   `npm run build`
+-   **Deployment**: The project is configured for deployment via **Firebase App Hosting**.
+    1.  A `firebase.json` would be needed to link to the App Hosting backend (not currently present but required for real deployment).
+    2.  The `apphosting.yaml` file configures the runtime environment, such as the maximum number of server instances.
+    3.  Deployment is typically handled by connecting a GitHub repository to the Firebase App Hosting backend, which provides automatic CI/CD.
+-   **Local Git to GitHub Push**: A script (`publish-to-github.sh`) is provided to help the user publish the code to their own GitHub repository from their local machine.
+-   **Environment Variables**:
+    -   `NEXT_PUBLIC_DEMO_MODE='true'`: Enables the "Continue as Guest" button on the login form.
+    -   **Firebase Configuration**: The Firebase SDK configuration is hardcoded in `src/firebase/config.ts`. In a production setup, these should be managed by Firebase App Hosting's built-in environment variables.
+    -   `GEMINI_API_KEY`: Required for Genkit to authenticate with the Google AI backend. This should be set in a `.env` file locally or as a secret in the hosting environment.
+
+---
+
+## 7. Testing & QA
+
+-   **Security Rules Testing**: The primary testing mechanism for security is the real-time feedback loop created by the `FirestorePermissionError` system. During development, any action that violates a rule immediately throws a detailed error in the browser overlay, showing the exact request context that was denied. This allows for rapid, iterative testing of the security rules.
+-   **Static Analysis**: `typescript` and `eslint` are used for static type checking and linting to catch errors before runtime. `tsc --noEmit` can be run to check for type errors.
+-   **Unit/Integration Tests**: No formal test suites (e.g., Jest, Playwright) are included in this prototype. However, the architecture is testable:
+    -   UI Components can be tested individually.
+    -   Genkit flows and services can be tested as isolated server-side functions.
+
+---
+
+## 8. Security & Compliance
+
+-   **Authentication**: Handled by Firebase Authentication. Supports Email/Password and Anonymous providers.
+-   **Authorization (Data Access)**: The most critical security feature. Handled entirely by `firestore.rules`.
+    -   **Tenant Isolation**: All rules are predicated on a `isTenantMember(tenantId)` check, which verifies that the authenticated user belongs to the tenant whose data is being accessed. This prevents any cross-tenant data leakage.
+    -   **Role-Based Access Control (RBAC)**: Write permissions are granted based on the user's role (e.g., `admin`, `ops`) stored in their Firestore profile, using the `canWriteInTenant(tenantId)` function. `viewer` roles are implicitly read-only.
+-   **Audit Logging**: The AI flows (`suggest-actions.ts`, `ops-copilot-flow.ts`) contain `console.log` statements that serve as placeholders for a structured audit trail. In a production environment, these would be replaced with writes to a dedicated, secured Firestore collection to log every AI decision, the prompt used, and the user who triggered it.
+-   **Client-Side Security**: The application disallows critical operations from the client. For example, tenant creation/deletion and user creation (invites only create a pending document) are restricted by security rules, assuming they would be handled by a trusted backend process.
+
+---
+
+## 9. Analytics & Monitoring
+
+-   **Analytics**: A robust foundation for analytics is provided by the `events` collection in Firestore. Every significant action (downtime logs, incident creation, shift handovers) is recorded as a structured document. This data can be easily piped into analytics tools like BigQuery or visualized directly. The `EventLog` component on the dashboard is a simple example of this.
+-   **Monitoring & Alerting**: The "Alerts Engine" module is the core of the monitoring system.
+    -   Users can define alert rules in plain English, which are converted to JSON configurations by an AI.
+    -   These rules are stored in the `alertRules` collection in Firestore.
+    -   The `AlertsInbox` component simulates a real-time view of active alerts by querying for rules that are currently `enabled: true`.
+
+---
+
+## 10. Known Issues & TODOs
+
+-   **Incomplete Modules**: The "Smart Plant," "Smart Tracking," and "Smart Integrations" pages are placeholders and contain no functional components.
+-   **Mock Data Usage**: Several components still rely on mock data from `src/lib/mock-data.ts` (e.g., `ProductionChart`, `DowntimeChart`) instead of fetching live data from Firestore.
+-   **User Invitation Flow**: The current "Invite User" feature only creates a `pending` document in Firestore. A full implementation would require a Cloud Function to create a real Firebase Auth user and send an invitation email.
+-   **AI Tool Limitations**: The Ops Copilot's tools are limited to fetching incidents and vehicles. Additional tools would need to be created to answer questions about other data types (e.g., plant telemetry, user compliance).
+-   **Hardcoded Tenant ID**: The `MOCK_TENANT_ID` ('VeraMine') is hardcoded throughout the application. A full multi-tenant implementation would require a mechanism to dynamically determine the current tenant (e.g., from the URL subdomain).
+-   **Error Handling for AI Flows**: While Firestore errors are handled gracefully, errors within the Genkit flows (e.g., LLM API failures) are currently caught with a generic `console.error` and a user-facing toast message. This could be made more robust.
+-   **No Pagination**: Lists (e.g., `IncidentList`, `UserList`) fetch a limited number of documents but do not include UI for paginating through older data.
+
+---
+
+## 11. Appendix
+
+-   **Firebase Genkit Documentation**: [https://firebase.google.com/docs/genkit](https://firebase.google.com/docs/genkit)
+-   **Next.js Documentation**: [https://nextjs.org/docs](https://nextjs.org/docs)
+-   **Firestore Security Rules Documentation**: [https://firebase.google.com/docs/firestore/security/get-started](https://firebase.google.com/docs/firestore/security/get-started)
+-   **ShadCN UI Components**: [https://ui.shadcn.com/](https://ui.shadcn.com/)
