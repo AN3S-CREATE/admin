@@ -10,6 +10,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { getIncidentsTool } from '../tools/firestore-tools';
 
 const OpsCopilotInputSchema = z.object({
   message: z.string().describe('The user\'s message to the copilot.'),
@@ -29,12 +30,20 @@ const prompt = ai.definePrompt({
   name: 'opsCopilotPrompt',
   input: {schema: OpsCopilotInputSchema},
   output: {schema: OpsCopilotOutputSchema},
-  prompt: `You are an expert AI assistant for mining operations called Ops Copilot. 
+  tools: [getIncidentsTool],
+  system: `You are an expert AI assistant for mining operations called Ops Copilot. 
   Your goal is to provide helpful and accurate information to the user.
-  For now, you are in a conversational mode. Respond to the user's message as helpfully as possible.
+  
+  You have access to tools that can retrieve live data from the operation's database.
+  When a user asks a question that requires information about incidents, events, or other operational data,
+  you MUST use the available tools to fetch that information.
 
-  User Message: {{{message}}}
+  Do not invent or hallucinate facts. If the tools do not provide the information, state that you
+  do not have access to that information and suggest what data might be needed.
+  
+  When you provide an answer based on tool output, be sure to cite the source of the information.
   `,
+  prompt: `User Message: {{{message}}}`,
 });
 
 const opsCopilotFlow = ai.defineFlow(
@@ -44,10 +53,18 @@ const opsCopilotFlow = ai.defineFlow(
     outputSchema: OpsCopilotOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const llmResponse = await prompt(input);
+    const { output, history } = llmResponse;
     if (!output) {
       return { response: "I'm sorry, I couldn't generate a response." };
     }
+    
+    // Log tool usage for guardrails/auditing
+    const toolCalls = history.filter(m => m.role === 'tool');
+    if (toolCalls.length > 0) {
+      console.log('OpsCopilot used the following tools:', toolCalls.map(t => t.content[0].toolRequest.name).join(', '));
+    }
+
     return { response: output.response };
   }
 );
