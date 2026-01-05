@@ -131,6 +131,10 @@ export function EventLog() {
 }
 
 function getEventDetails(event: Event): string {
+    if (!event.payload || typeof event.payload !== 'object') {
+        return event.payload ? String(event.payload) : 'No details';
+    }
+
     switch(event.eventType) {
         case 'downtime':
             return `Asset '${event.payload.assetId}' reported ${event.payload.duration} mins downtime. Reason: ${event.payload.reason}.`;
@@ -139,6 +143,7 @@ function getEventDetails(event: Event): string {
         case 'handover':
             return `Shift handover notes submitted for site '${event.payload.siteId}'.`;
         default:
-            return JSON.stringify(event.payload);
+            // Fallback for any other event types
+            return event.payload.details || event.payload.message || JSON.stringify(event.payload);
     }
 }
