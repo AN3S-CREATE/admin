@@ -7,8 +7,9 @@ import { ProductionChart } from "@/components/dashboard/production-chart";
 import { DowntimeChart } from "@/components/dashboard/downtime-chart";
 import { RecommendedActions } from "@/components/dashboard/recommended-actions";
 import { motion } from "framer-motion";
-import { recommendedActionsData, statCards } from '@/lib/mock-data';
+import { recommendedActionsData } from '@/lib/mock-data';
 import { EventLog } from "@/components/dashboard/event-log";
+import { Activity, AlertTriangle, ArrowUp, Truck } from "lucide-react";
 
 const containerVariants = {
   hidden: { opacity: 1 },
@@ -19,6 +20,41 @@ const containerVariants = {
     },
   },
 };
+
+const statCards = [
+    {
+      title: "Overall Production",
+      value: "14,280 Tonnes",
+      icon: Activity,
+      trend: "up" as const,
+      trendValue: "12.5%",
+      period: "vs last month",
+    },
+    {
+      title: "Equipment Uptime",
+      value: "98.2%",
+      icon: ArrowUp,
+      trend: "up" as const,
+      trendValue: "1.2%",
+      period: "vs last month",
+    },
+    {
+      title: "Fleet Availability",
+      value: "89%",
+      icon: Truck,
+      trend: "down" as const,
+      trendValue: "2.1%",
+      period: "vs last month",
+    },
+    {
+      title: "Active Alerts",
+      value: "3",
+      icon: AlertTriangle,
+      trend: "static" as const,
+      trendValue: "High Priority",
+      period: "needs attention",
+    },
+  ];
 
 export default function DashboardPage() {
   return (
