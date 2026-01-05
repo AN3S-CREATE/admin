@@ -7,7 +7,6 @@ import { ProductionChart } from "@/components/dashboard/production-chart";
 import { DowntimeChart } from "@/components/dashboard/downtime-chart";
 import { RecommendedActions } from "@/components/dashboard/recommended-actions";
 import { motion } from "framer-motion";
-import { recommendedActionsData } from '@/lib/mock-data';
 import { EventLog } from "@/components/dashboard/event-log";
 import { Activity, AlertTriangle, ArrowUp, Truck } from "lucide-react";
 import { AnomalyTriageCard } from "@/components/dashboard/anomaly-triage-card";

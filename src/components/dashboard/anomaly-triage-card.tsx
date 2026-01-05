@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Wand2, SearchCheck, Waypoints, Lightbulb } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { triageAnomaly, type TriageAnomalyOutput } from '@/ai/flows/triage-anomalies';
-import { Separator } from '../ui/separator';
 
 // Mock data to simulate an anomaly event
 const mockAnomaly = {
