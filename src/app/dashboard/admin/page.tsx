@@ -26,7 +26,7 @@ export default function AdminPage() {
     <div className="space-y-8">
       <PageHeader
         title="Admin Console"
-        description="Tenant management, site configuration, user access, role assignment, and feature toggle control."
+        description="Manage user access, assign roles, and monitor tenant activity."
       />
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="lg:col-span-1">
