@@ -4,5 +4,5 @@ export type Event = {
   timestamp: string;
   eventType: string;
   actor: string;
-  payload: any;
+  payload: any; // Using 'any' to match the flexible 'object' with additionalProperties in backend.json
 };
