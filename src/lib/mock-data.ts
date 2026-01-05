@@ -1,5 +1,5 @@
-import type { Incident } from '@/components/risk/incident-list';
-import type { User } from '@/components/admin/user-list';
+import type { Incident } from '@/types/incident';
+import type { User } from '@/types/user';
 import {
     Activity,
     ArrowUp,
@@ -32,6 +32,7 @@ export const downtimeData = [
 
 export const recommendedActionsData = [
   {
+    id: 'rec_1',
     action: 'Investigate recurring conveyor belt C-03 faults.',
     owner: 'Maintenance Team',
     impact: 'Reduce unplanned downtime by an estimated 8%.',
@@ -39,6 +40,7 @@ export const recommendedActionsData = [
     evidenceLinks: ['/dashboard/plant?filter=C-03', '/dashboard/reports/downtime-analysis']
   },
   {
+    id: 'rec_2',
     action: 'Review haul truck #12 telematics for inefficient routes.',
     owner: 'Dispatch',
     impact: 'Potential 5% fuel savings and faster cycle times.',
@@ -46,77 +48,13 @@ export const recommendedActionsData = [
     evidenceLinks: ['/dashboard/transport?vehicle=HT-12', '/dashboard/reports/fuel-efficiency']
   },
   {
+    id: 'rec_3',
     action: 'Schedule refresher safety training for night shift personnel.',
     owner: 'HSE Manager',
     impact: 'Mitigate risk of near-miss incidents observed recently.',
     confidence: 0.98,
     evidenceLinks: ['/dashboard/risk?filter=near-miss', '/dashboard/people/training-matrix']
   }
-];
-
-export const mockIncidents: Incident[] = [
-  {
-    id: 'INC-001',
-    title: 'Near-miss with Haul Truck #7',
-    date: '2024-05-10T14:30:00Z',
-    status: 'Under Investigation',
-    classification: 'Safety',
-    reportedBy: 'John Doe',
-  },
-  {
-    id: 'INC-002',
-    title: 'Conveyor Belt C-03 Failure',
-    date: '2024-05-09T08:00:00Z',
-    status: 'Closed',
-    classification: 'Operational',
-    reportedBy: 'Jane Smith',
-  },
-  {
-    id: 'INC-003',
-    title: 'Unauthorized Zone Entry',
-    date: '2024-05-08T22:15:00Z',
-    status: 'CAPA Pending',
-    classification: 'Security',
-    reportedBy: 'Alex Johnson',
-  },
-];
-
-export const mockUsers: User[] = [
-    {
-        id: 'usr_1',
-        email: 'admin@veramine.com',
-        displayName: 'Admin User',
-        role: 'admin',
-        status: 'active'
-    },
-    {
-        id: 'usr_2',
-        email: 'ops@veramine.com',
-        displayName: 'Ops Manager',
-        role: 'ops',
-        status: 'active'
-    },
-    {
-        id: 'usr_3',
-        email: 'safety@veramine.com',
-        displayName: 'Safety Officer',
-        role: 'safety',
-        status: 'active'
-    },
-    {
-        id: 'usr_4',
-        email: 'new.user@example.com',
-        displayName: 'Pending User',
-        role: 'viewer',
-        status: 'pending'
-    },
-     {
-        id: 'usr_5',
-        email: 'hr@veramine.com',
-        displayName: 'HR Manager',
-        role: 'hr',
-        status: 'active'
-    }
 ];
 
 export const statCards = [
