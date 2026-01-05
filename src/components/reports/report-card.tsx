@@ -15,7 +15,7 @@ type ReportCardProps = {
 export function ReportCard({ title, description, href, icon: Icon }: ReportCardProps) {
   return (
     <Link href={href} className="group">
-      <Card className="glass-card h-full transition-all hover:border-primary/50 hover:shadow-primary/10">
+      <Card className="glass-card h-full transition-all hover:border-primary/50 hover:shadow-primary/10 flex flex-col">
         <CardHeader className="flex flex-row items-center gap-4 space-y-0">
           <div className="rounded-lg bg-primary/10 p-3">
             <Icon className="h-6 w-6 text-primary" />
@@ -24,7 +24,7 @@ export function ReportCard({ title, description, href, icon: Icon }: ReportCardP
             <CardTitle>{title}</CardTitle>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex-grow">
           <CardDescription>{description}</CardDescription>
         </CardContent>
         <div className="flex justify-end p-4 pt-0">

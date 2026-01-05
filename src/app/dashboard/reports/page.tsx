@@ -2,7 +2,7 @@
 
 import { PageHeader } from '@/components/shared/page-header';
 import { ReportCard } from '@/components/reports/report-card';
-import { FileText, Shield, Activity, AlertTriangle } from 'lucide-react';
+import { FileText, Shield, Activity, AlertTriangle, Fuel } from 'lucide-react';
 
 const reports = [
   {
@@ -27,7 +27,7 @@ const reports = [
     title: 'Fuel Consumption Report',
     description: 'Track and analyze fuel usage across the entire vehicle fleet.',
     href: '#',
-    icon: FileText,
+    icon: Fuel,
   },
   {
     title: 'Incidents by Classification',
