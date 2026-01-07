@@ -53,16 +53,9 @@ const opsCopilotFlow = ai.defineFlow(
     outputSchema: OpsCopilotOutputSchema,
   },
   async input => {
-    const llmResponse = await prompt(input);
-    const { output, history } = llmResponse;
+    const { output } = await prompt(input);
     if (!output) {
       return { response: "I'm sorry, I couldn't generate a response." };
-    }
-    
-    // Log tool usage for guardrails/auditing
-    const toolCalls = history.filter(m => m.role === 'tool');
-    if (toolCalls.length > 0) {
-      console.log('OpsCopilot used the following tools:', toolCalls.map(t => t.content[0].toolRequest.name).join(', '));
     }
 
     return { response: output.response };
