@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,7 +13,6 @@ import { useAuth } from '@/firebase';
 import { useUser } from '@/firebase/auth/use-user';
 import { signInWithEmailAndPassword, signInAnonymously } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
-import { VeralogixLogo } from '../brand/veralogix-logo';
 
 export function LoginForm() {
   const router = useRouter();
@@ -70,9 +70,15 @@ export function LoginForm() {
 
   return (
     <Card className="w-full max-w-md glass-card">
-      <CardHeader className="text-center">
-        <VeralogixLogo className="h-12 mx-auto mb-4" />
-        <CardTitle className="font-headline text-3xl">Veralogix Smart Mining</CardTitle>
+      <CardHeader className="text-center space-y-4">
+        <Image 
+          src="/veralogix-logo.png"
+          alt="Veralogix Logo"
+          width={300}
+          height={67}
+          className="mx-auto"
+          priority
+        />
         <CardDescription>Central nervous system for your mining operations.</CardDescription>
       </CardHeader>
       <form onSubmit={handleLogin}>
