@@ -46,6 +46,13 @@ const ROLE_SCREENS: Record<string, string[]> = {
   ],
 };
 
+interface ScreenshotManifestItem {
+  role: string;
+  screen: string;
+  filename: string;
+  path: string; // internal zip path
+}
+
 async function generateScreenshots() {
   const browser = await chromium.launch();
   const context = await browser.newContext({
@@ -58,6 +65,8 @@ async function generateScreenshots() {
   if (!fs.existsSync(screenshotDir)) {
     fs.mkdirSync(screenshotDir, { recursive: true });
   }
+
+  const manifest: ScreenshotManifestItem[] = [];
 
   try {
     for (const role of ROLES) {
@@ -88,6 +97,14 @@ async function generateScreenshots() {
 
             await page.screenshot({ path: filepath, fullPage: true });
             console.log(`  Saved ${filename}`);
+
+            manifest.push({
+              role,
+              screen: screenName,
+              filename,
+              path: `${role}/${screenName}.png`
+            });
+
         } catch (e) {
             console.error(`  Failed to capture ${screen} for ${role}:`, e);
         } finally {
@@ -95,6 +112,14 @@ async function generateScreenshots() {
         }
       }
     }
+
+    // Write manifest
+    fs.writeFileSync(
+      path.join(screenshotDir, 'manifest.json'),
+      JSON.stringify(manifest, null, 2)
+    );
+    console.log('  Saved manifest.json');
+
   } catch (error) {
     console.error('Error generating screenshots:', error);
   } finally {
