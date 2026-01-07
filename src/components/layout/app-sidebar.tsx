@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { HardHat, LayoutDashboard, Truck, Factory, ClipboardList, ShieldAlert, Users, FileText, MapPin, Plug, Settings, Bell } from 'lucide-react';
+import { LayoutDashboard, Truck, Factory, ClipboardList, ShieldAlert, Users, FileText, MapPin, Plug, Settings } from 'lucide-react';
 import {
   Sidebar,
   SidebarHeader,
@@ -13,7 +13,7 @@ import {
   SidebarFooter,
 } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { VeralogixLogo } from '../brand/veralogix-logo';
 
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -24,7 +24,7 @@ const navItems = [
   { href: '/dashboard/people', icon: Users, label: 'People' },
   { href: '/dashboard/reports', icon: FileText, label: 'Reports' },
   { href: '/dashboard/tracking', icon: MapPin, label: 'Tracking' },
-  { href: '/dashboard/alerts', icon: Bell, label: 'Alerts' },
+  { href: '/dashboard/alerts', icon: () => <VeralogixLogo variant="icon" className="h-4 w-4" />, label: 'Alerts' },
   { href: '/dashboard/integrations', icon: Plug, label: 'Integrations' },
 ];
 
@@ -40,7 +40,7 @@ export function AppSidebar() {
       <SidebarHeader className="p-4">
         <Link href="/dashboard" className="flex items-center gap-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-            <HardHat className="h-6 w-6 text-primary" />
+            <VeralogixLogo variant="icon" className="h-6 w-6" />
           </div>
           <span className={cn(
             "font-headline text-2xl font-bold text-primary",

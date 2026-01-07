@@ -7,11 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { HardHat, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/firebase';
 import { useUser } from '@/firebase/auth/use-user';
 import { signInWithEmailAndPassword, signInAnonymously } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
+import { VeralogixLogo } from '../brand/veralogix-logo';
 
 export function LoginForm() {
   const router = useRouter();
@@ -70,9 +71,7 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-md glass-card">
       <CardHeader className="text-center">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-          <HardHat className="h-8 w-8 text-primary" />
-        </div>
+        <VeralogixLogo className="h-12 mx-auto mb-4" />
         <CardTitle className="font-headline text-3xl">Veralogix Smart Mining</CardTitle>
         <CardDescription>Central nervous system for your mining operations.</CardDescription>
       </CardHeader>
