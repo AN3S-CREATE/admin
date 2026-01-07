@@ -7,7 +7,7 @@ import { UserList } from '@/components/admin/user-list';
 import { useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
 
-const MOCK_TENANT_ID = 'VeraMine'; // As defined in use-user.tsx
+const MOCK_TENANT_ID = 'Veralogix'; // As defined in use-user.tsx
 
 export default function AdminPage() {
   const firestore = useFirestore();

@@ -19,7 +19,7 @@ type UserListProps = {
   isLoading: boolean;
 };
 
-const MOCK_TENANT_ID = 'VeraMine';
+const MOCK_TENANT_ID = 'Veralogix';
 
 const statusColors: Record<User['status'], string> = {
     'active': 'bg-green-500/20 text-green-400 border-green-500/30',

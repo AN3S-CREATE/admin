@@ -1,9 +1,9 @@
-# VeraMine Hub: Technical Engineering Report
+# Veralogix Smart Mining: Technical Engineering Report
 
 **Version:** 1.0
 **Date:** 2024-07-29
 
-This document provides a comprehensive, engineering-level technical overview of the VeraMine Hub application. It is intended for developers, architects, and technical stakeholders.
+This document provides a comprehensive, engineering-level technical overview of the Veralogix Smart Mining application. It is intended for developers, architects, and technical stakeholders.
 
 ---
 
@@ -266,7 +266,7 @@ The application follows a modern, server-enhanced web architecture based on Next
 -   **Mock Data Usage**: Several components still rely on mock data from `src/lib/mock-data.ts` (e.g., `ProductionChart`, `DowntimeChart`) instead of fetching live data from Firestore.
 -   **User Invitation Flow**: The current "Invite User" feature only creates a `pending` document in Firestore. A full implementation would require a Cloud Function to create a real Firebase Auth user and send an invitation email.
 -   **AI Tool Limitations**: The Ops Copilot's tools are limited to fetching incidents and vehicles. Additional tools would need to be created to answer questions about other data types (e.g., plant telemetry, user compliance).
--   **Hardcoded Tenant ID**: The `MOCK_TENANT_ID` ('VeraMine') is hardcoded throughout the application. A full multi-tenant implementation would require a mechanism to dynamically determine the current tenant (e.g., from the URL subdomain).
+-   **Hardcoded Tenant ID**: The `MOCK_TENANT_ID` ('Veralogix') is hardcoded throughout the application. A full multi-tenant implementation would require a mechanism to dynamically determine the current tenant (e.g., from the URL subdomain).
 -   **Error Handling for AI Flows**: While Firestore errors are handled gracefully, errors within the Genkit flows (e.g., LLM API failures) are currently caught with a generic `console.error` and a user-facing toast message. This could be made more robust.
 -   **No Pagination**: Lists (e.g., `IncidentList`, `UserList`) fetch a limited number of documents but do not include UI for paginating through older data.
 

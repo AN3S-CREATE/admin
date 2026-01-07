@@ -17,7 +17,7 @@ export function LoginForm() {
   const router = useRouter();
   const auth = useAuth();
   const { toast } = useToast();
-  const [email, setEmail] = useState('demo@veramine.com');
+  const [email, setEmail] = useState('demo@veralogix.com');
   const [password, setPassword] = useState('password');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const { user, isUserLoading } = useUser();
@@ -73,7 +73,7 @@ export function LoginForm() {
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
           <HardHat className="h-8 w-8 text-primary" />
         </div>
-        <CardTitle className="font-headline text-3xl">VeraMine Hub</CardTitle>
+        <CardTitle className="font-headline text-3xl">Veralogix Smart Mining</CardTitle>
         <CardDescription>Central nervous system for your mining operations.</CardDescription>
       </CardHeader>
       <form onSubmit={handleLogin}>

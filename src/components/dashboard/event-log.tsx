@@ -13,7 +13,7 @@ import type { Event } from '@/types/event';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
 
-const MOCK_TENANT_ID = 'VeraMine'; // As defined in use-user.tsx
+const MOCK_TENANT_ID = 'Veralogix'; // As defined in use-user.tsx
 
 const eventTypeConfig: Record<string, { icon: React.ElementType; color: string; }> = {
     downtime: { icon: TimerOff, color: 'text-orange-400' },

@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { generateReportNarrative } from '@/ai/flows/generate-report-narrative';
 import type { Incident } from '@/types/incident';
 
-const MOCK_TENANT_ID = 'VeraMine'; // As defined in use-user.tsx
+const MOCK_TENANT_ID = 'Veralogix'; // As defined in use-user.tsx
 
 export default function SafetyReportPage() {
   const firestore = useFirestore();

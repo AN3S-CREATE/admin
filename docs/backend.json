@@ -5,7 +5,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Tenant",
       "type": "object",
-      "description": "Represents a tenant within the VeraMine Hub multi-tenant platform.",
+      "description": "Represents a tenant within the Veralogix Smart Mining multi-tenant platform.",
       "properties": {
         "id": {
           "type": "string",
@@ -34,7 +34,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "User",
       "type": "object",
-      "description": "Represents a user within the VeraMine Hub platform.",
+      "description": "Represents a user within the Veralogix Smart Mining platform.",
       "properties": {
         "id": {
           "type": "string",
@@ -293,7 +293,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Incident",
       "type": "object",
-      "description": "Represents an incident within the VeraMine Hub platform.",
+      "description": "Represents an incident within the Veralogix Smart Mining platform.",
       "properties": {
         "id": {
           "type": "string",

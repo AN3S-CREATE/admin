@@ -46,7 +46,7 @@ export function AppSidebar() {
             "font-headline text-2xl font-bold text-primary",
             "group-data-[collapsible=icon]:hidden"
           )}>
-            VeraMine
+            Veralogix
           </span>
         </Link>
       </SidebarHeader>

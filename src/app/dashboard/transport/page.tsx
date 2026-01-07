@@ -8,7 +8,7 @@ import { collection } from 'firebase/firestore';
 import type { Vehicle } from "@/types/transport";
 import { VehicleForm } from "@/components/transport/vehicle-form";
 
-const MOCK_TENANT_ID = 'VeraMine';
+const MOCK_TENANT_ID = 'Veralogix';
 
 export default function TransportPage() {
   const firestore = useFirestore();

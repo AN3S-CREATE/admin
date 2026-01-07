@@ -12,7 +12,7 @@ export interface UseUserResult {
   userError: Error | null;
 }
 
-const MOCK_TENANT_ID = 'VeraMine';
+const MOCK_TENANT_ID = 'Veralogix';
 
 export function useUser(): UseUserResult {
   const auth = useAuth();
@@ -79,7 +79,7 @@ export function useUser(): UseUserResult {
             setProfile({
               id: firebaseUser.uid,
               tenantId: MOCK_TENANT_ID,
-              email: 'guest@veramine.com',
+              email: 'guest@veralogix.com',
               displayName: 'Guest User',
               role: 'viewer',
               status: 'active'

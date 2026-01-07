@@ -12,7 +12,7 @@ import { Skeleton } from "../ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import type { AiRecommendation } from "@/types/ai-recommendation";
 
-const MOCK_TENANT_ID = 'VeraMine';
+const MOCK_TENANT_ID = 'Veralogix';
 
 export function RecommendedActions() {
   const firestore = useFirestore();

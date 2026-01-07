@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -15,7 +14,7 @@ import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import type { User } from '@/types/user';
 
 const roles = ["admin", "ops", "hr", "safety", "viewer"];
-const MOCK_TENANT_ID = 'VeraMine'; // As defined in use-user.tsx
+const MOCK_TENANT_ID = 'Veralogix'; // As defined in use-user.tsx
 
 export function UserInviteForm() {
     const [email, setEmail] = useState('');
