@@ -8,7 +8,5 @@ export const ai = genkit({
     // for more information.
   })],
   // Log to a file, to the console, or turn them off completely.
-  logLevel: "debug",
   // Correlate related operations with a single trace ID.
-  enableTracingAndMetrics: true,
 });
