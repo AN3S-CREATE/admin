@@ -3,9 +3,9 @@
 /**
  * @fileOverview A conversational flow for the Ops Copilot.
  *
- * - opsCopilotFlow - A function that handles the conversational chat.
- * - OpsCopilotInput - The input type for the opsCopilotFlow function.
- * - OpsCopilotOutput - The return type for the opsCopilotFlow function.
+ * - opsCopilot - A function that handles the conversational chat.
+ * - OpsCopilotInput - The input type for the opsCopilot function.
+ * - OpsCopilotOutput - The return type for the opsCopilot function.
  */
 
 import {ai} from '@/ai/genkit';
@@ -34,7 +34,7 @@ const prompt = ai.definePrompt({
   system: `You are an expert AI assistant for mining operations called Ops Copilot. 
   Your goal is to provide helpful and accurate information to the user.
   
-  You have access to tools that can retrieve live data from the operation's database, including incidents and the vehicle fleet.
+  You have access to tools that can retrieve live data from the operation\'s database, including incidents and the vehicle fleet.
   When a user asks a question that requires information about incidents, events, vehicles, or other operational data,
   you MUST use the available tools to fetch that information.
 
@@ -53,16 +53,9 @@ const opsCopilotFlow = ai.defineFlow(
     outputSchema: OpsCopilotOutputSchema,
   },
   async input => {
-    const llmResponse = await prompt(input);
-    const { output, history } = llmResponse;
+    const { output } = await prompt(input);
     if (!output) {
       return { response: "I'm sorry, I couldn't generate a response." };
-    }
-    
-    // Log tool usage for guardrails/auditing
-    const toolCalls = history.filter(m => m.role === 'tool');
-    if (toolCalls.length > 0) {
-      console.log('OpsCopilot used the following tools:', toolCalls.map(t => t.content[0].toolRequest.name).join(', '));
     }
 
     return { response: output.response };

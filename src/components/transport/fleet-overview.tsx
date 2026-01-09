@@ -45,7 +45,7 @@ const vehicleTypeIcons: Record<Vehicle['type'], React.ElementType> = {
     'Dozer': Construction,
 };
 
-const MOCK_TENANT_ID = 'VeraMine';
+const MOCK_TENANT_ID = 'Veralogix';
 
 export function FleetOverview({ vehicles, isLoading, onEdit }: FleetOverviewProps) {
   const firestore = useFirestore();

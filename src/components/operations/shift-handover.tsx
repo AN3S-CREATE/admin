@@ -11,7 +11,7 @@ import { collection, doc } from 'firebase/firestore';
 import { addDocumentNonBlocking, setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { useToast } from '@/hooks/use-toast';
 
-const MOCK_TENANT_ID = 'VeraMine';
+const MOCK_TENANT_ID = 'Veralogix';
 const MOCK_SITE_ID = 'SiteA';
 
 export function ShiftHandover() {

@@ -15,7 +15,7 @@ import type { Vehicle } from '@/types/transport';
 const vehicleTypes: Vehicle['type'][] = ["Haul Truck", "Light Vehicle", "Excavator", "Dozer"];
 const vehicleStatuses: Vehicle['status'][] = ["On Route", "Idle", "Maintenance", "Offline"];
 
-const MOCK_TENANT_ID = 'VeraMine';
+const MOCK_TENANT_ID = 'Veralogix';
 
 type VehicleFormProps = {
   vehicleToEdit: Vehicle | null;

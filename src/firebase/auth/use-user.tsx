@@ -5,6 +5,7 @@ import { onAuthStateChanged, type User as FirebaseAuthUser } from 'firebase/auth
 import { doc, onSnapshot } from 'firebase/firestore';
 import { useAuth, useFirestore, useMemoFirebase } from '@/firebase';
 import type { User as AppUser } from '@/types/user';
+import { MOCK_USERS } from '@/lib/mock-users';
 
 export interface UseUserResult {
   user: (AppUser & { uid: string }) | null;
@@ -12,7 +13,7 @@ export interface UseUserResult {
   userError: Error | null;
 }
 
-const MOCK_TENANT_ID = 'VeraMine';
+const MOCK_TENANT_ID = 'Veralogix';
 
 export function useUser(): UseUserResult {
   const auth = useAuth();
@@ -24,6 +25,21 @@ export function useUser(): UseUserResult {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
+    // Check for Mock Mode via local storage (set by Playwright)
+    // We check this first to bypass Firebase auth entirely if needed for screenshots
+    // ONLY ENABLE IN DEVELOPMENT
+    if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
+        const mockRole = localStorage.getItem('MOCK_ROLE');
+        if (mockRole && MOCK_USERS[mockRole as keyof typeof MOCK_USERS]) {
+            // @ts-ignore
+            setFirebaseUser({ uid: MOCK_USERS[mockRole as keyof typeof MOCK_USERS].uid } as FirebaseAuthUser);
+            // @ts-ignore
+            setProfile(MOCK_USERS[mockRole as keyof typeof MOCK_USERS]);
+            setIsLoading(false);
+            return;
+        }
+    }
+
     if (!auth) {
       setIsLoading(false);
       return;
@@ -78,7 +94,8 @@ export function useUser(): UseUserResult {
           if (firebaseUser?.isAnonymous) {
             setProfile({
               id: firebaseUser.uid,
-              email: 'guest@veramine.com',
+              tenantId: MOCK_TENANT_ID,
+              email: 'guest@veralogix.com',
               displayName: 'Guest User',
               role: 'viewer',
               status: 'active'
@@ -88,6 +105,7 @@ export function useUser(): UseUserResult {
              // For demo purposes, create a temporary profile if one doesn't exist
              setProfile({
                 id: firebaseUser?.uid || '',
+                tenantId: MOCK_TENANT_ID,
                 email: firebaseUser?.email || '',
                 displayName: firebaseUser?.displayName || 'Demo User',
                 role: 'admin', // Default to admin for demo ease

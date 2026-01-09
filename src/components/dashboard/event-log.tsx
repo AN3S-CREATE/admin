@@ -6,14 +6,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '../ui/skeleton';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection, query, orderBy, limit, where } from 'firebase/firestore';
+import { collection, query, orderBy, limit, where, type QueryConstraint } from 'firebase/firestore';
 import { formatDistanceToNow } from 'date-fns';
 import { Activity, ClipboardPaste, ShieldAlert, TimerOff } from 'lucide-react';
 import type { Event } from '@/types/event';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
 
-const MOCK_TENANT_ID = 'VeraMine'; // As defined in use-user.tsx
+const MOCK_TENANT_ID = 'Veralogix'; // As defined in use-user.tsx
 
 const eventTypeConfig: Record<string, { icon: React.ElementType; color: string; }> = {
     downtime: { icon: TimerOff, color: 'text-orange-400' },
@@ -33,7 +33,7 @@ export function EventLog() {
     if (!firestore) return null;
     const baseRef = collection(firestore, 'tenants', MOCK_TENANT_ID, 'events');
     
-    const queries = [orderBy('timestamp', 'desc'), limit(15)];
+    const queries: QueryConstraint[] = [orderBy('timestamp', 'desc'), limit(15)];
     if (filter) {
       queries.unshift(where('eventType', '==', filter));
     }
@@ -131,6 +131,10 @@ export function EventLog() {
 }
 
 function getEventDetails(event: Event): string {
+    if (!event.payload || typeof event.payload !== 'object') {
+        return event.payload ? String(event.payload) : 'No details';
+    }
+
     switch(event.eventType) {
         case 'downtime':
             return `Asset '${event.payload.assetId}' reported ${event.payload.duration} mins downtime. Reason: ${event.payload.reason}.`;
@@ -139,6 +143,7 @@ function getEventDetails(event: Event): string {
         case 'handover':
             return `Shift handover notes submitted for site '${event.payload.siteId}'.`;
         default:
-            return JSON.stringify(event.payload);
+            // Fallback for any other event types
+            return event.payload.details || event.payload.message || JSON.stringify(event.payload);
     }
 }

@@ -7,8 +7,8 @@
 
 # --- Configuration ---
 GITHUB_USERNAME="AN3S-CREATE"
-REPO_NAME="VeraMine_Hub"
-GIT_REMOTE_URL="https://github.com/${GITHUB_USERNAME}/${REPO_NAME}.git"
+REPO_NAME="Veralogix_Smart_Mining"
+GIT_REMOTE_URL="https://github.com/AN3S-CREATE/Veralogix_Smart_Mining.git"
 
 # --- Steps ---
 
@@ -40,7 +40,7 @@ if git diff-index --quiet HEAD --; then
     echo "No changes to commit. Working tree is clean."
 else
     echo "Committing all files..."
-    git commit -m "Initial commit of VeraMine Hub project"
+    git commit -m "Initial commit of Veralogix Smart Mining project"
 fi
 
 echo "--- Pushing to GitHub ---"

@@ -1,7 +1,7 @@
 'use client';
 import { getAuth, type User } from 'firebase/auth';
 
-type SecurityRuleContext = {
+export type SecurityRuleContext = {
   path: string;
   operation: 'get' | 'list' | 'create' | 'update' | 'delete' | 'write';
   requestResourceData?: any;
@@ -9,12 +9,13 @@ type SecurityRuleContext = {
 
 interface FirebaseAuthToken {
   name: string | null;
+  picture?: string;
   email: string | null;
   email_verified: boolean;
   phone_number: string | null;
   sub: string;
   firebase: {
-    identities: Record<string, string[]>;
+    identities: Record<string, any>;
     sign_in_provider: string;
     tenant: string | null;
   };
@@ -46,6 +47,7 @@ function buildAuthObject(currentUser: User | null): FirebaseAuthObject | null {
 
   const token: FirebaseAuthToken = {
     name: currentUser.displayName,
+    picture: currentUser.photoURL ?? undefined,
     email: currentUser.email,
     email_verified: currentUser.emailVerified,
     phone_number: currentUser.phoneNumber,
@@ -56,7 +58,7 @@ function buildAuthObject(currentUser: User | null): FirebaseAuthObject | null {
           acc[p.providerId] = [p.uid];
         }
         return acc;
-      }, {} as Record<string, string[]>),
+      }, {} as Record<string, any>),
       sign_in_provider: currentUser.providerData[0]?.providerId || 'custom',
       tenant: currentUser.tenantId,
     },
@@ -102,7 +104,7 @@ function buildRequestObject(context: SecurityRuleContext): SecurityRuleRequest {
  * @returns A string containing the error message and the JSON payload.
  */
 function buildErrorMessage(requestObject: SecurityRuleRequest): string {
-  return `Missing or insufficient permissions: The following request was denied by Firestore Security Rules:
+  return `FirestoreError: Missing or insufficient permissions: The following request was denied by Firestore Security Rules:
 ${JSON.stringify(requestObject, null, 2)}`;
 }
 
@@ -117,7 +119,7 @@ export class FirestorePermissionError extends Error {
   constructor(context: SecurityRuleContext) {
     const requestObject = buildRequestObject(context);
     super(buildErrorMessage(requestObject));
-    this.name = 'FirebaseError';
+    this.name = 'FirestorePermissionError';
     this.request = requestObject;
   }
 }

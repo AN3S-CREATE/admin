@@ -9,6 +9,11 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { initializeFirebase } from '@/firebase';
+import { collection } from 'firebase/firestore';
+import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+
+const MOCK_TENANT_ID = 'VeraMine';
 
 const SuggestActionsInputSchema = z.object({
   siteDescription: z.string().describe('A description of the mine site and its current operational status.'),
@@ -64,21 +69,31 @@ const suggestActionsFlow = ai.defineFlow(
     outputSchema: SuggestActionsOutputSchema,
   },
   async (input) => {
+    const { firestore } = initializeFirebase();
+    const recommendationsColRef = collection(firestore, 'tenants', MOCK_TENANT_ID, 'aiRecommendations');
+    
     const response = await suggestActionsPrompt(input);
     const { output, usage } = response;
     
-    // This is where we would persist the recommendations with guardrail metadata.
-    // In a real implementation, you would replace this log with a call to a Firestore service.
-    // For the prototype, we will return the data and let the client-side component handle storage.
-    
-    console.log("AI Guardrail Log for suggestActionsFlow:");
-    console.log({
-      userId: input.userId,
-      timestamp: new Date().toISOString(),
-      model: usage?.response?.model,
-      prompt: PROMPT_TEMPLATE, // Storing the template
-      // In a real app, you'd save each generated recommendation to Firestore here.
-    });
+    if (output?.suggestedActions) {
+        for (const action of output.suggestedActions) {
+            const recommendationToStore = {
+                tenantId: MOCK_TENANT_ID,
+                recommendation: action.action,
+                owner: action.owner,
+                impact: action.impact,
+                confidence: action.confidence,
+                evidenceLinks: action.evidenceLinks,
+                verified: null, // Recommendations start as unverified.
+                userId: input.userId,
+                timestamp: new Date().toISOString(),
+                model: 'google-genai',
+                prompt: PROMPT_TEMPLATE,
+            };
+            // Persist each recommendation without blocking
+            addDocumentNonBlocking(recommendationsColRef, recommendationToStore);
+        }
+    }
 
     return output!;
   }

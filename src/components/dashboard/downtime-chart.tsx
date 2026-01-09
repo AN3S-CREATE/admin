@@ -52,9 +52,12 @@ export function DowntimeChart() {
               innerRadius={60}
               strokeWidth={5}
             >
-              {downtimeData.map((entry) => (
-                <Cell key={`cell-${entry.reason}`} fill={chartConfig[entry.reason.toLowerCase() as keyof typeof chartConfig]?.color || '#ccc'} />
-              ))}
+              {downtimeData.map((entry) => {
+                 const key = entry.reason.toLowerCase() as keyof typeof chartConfig;
+                 const configItem = chartConfig[key];
+                 const color = configItem && 'color' in configItem ? configItem.color : '#ccc';
+                 return <Cell key={`cell-${entry.reason}`} fill={color} />
+              })}
             </Pie>
           </PieChart>
         </ChartContainer>

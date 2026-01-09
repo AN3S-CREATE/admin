@@ -1,0 +1,42 @@
+export const MOCK_USERS = {
+  admin: {
+    uid: 'mock-admin-uid',
+    id: 'mock-admin-uid',
+    email: 'admin@veramine.com',
+    displayName: 'Admin User',
+    role: 'admin',
+    status: 'active',
+  },
+  ops: {
+    uid: 'mock-ops-uid',
+    id: 'mock-ops-uid',
+    email: 'ops@veramine.com',
+    displayName: 'Operations Manager',
+    role: 'ops',
+    status: 'active',
+  },
+  hr: {
+    uid: 'mock-hr-uid',
+    id: 'mock-hr-uid',
+    email: 'hr@veramine.com',
+    displayName: 'HR Manager',
+    role: 'hr',
+    status: 'active',
+  },
+  safety: {
+    uid: 'mock-safety-uid',
+    id: 'mock-safety-uid',
+    email: 'safety@veramine.com',
+    displayName: 'Safety Officer',
+    role: 'safety',
+    status: 'active',
+  },
+  viewer: {
+    uid: 'mock-viewer-uid',
+    id: 'mock-viewer-uid',
+    email: 'viewer@veramine.com',
+    displayName: 'Guest Viewer',
+    role: 'viewer',
+    status: 'active',
+  },
+};
