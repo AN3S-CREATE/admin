@@ -87,7 +87,7 @@ const suggestActionsFlow = ai.defineFlow(
                 verified: null, // Recommendations start as unverified.
                 userId: input.userId,
                 timestamp: new Date().toISOString(),
-                model: usage?.response?.model || 'unknown',
+                model: 'google-genai',
                 prompt: PROMPT_TEMPLATE,
             };
             // Persist each recommendation without blocking

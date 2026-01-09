@@ -51,7 +51,7 @@ export function UserInviteForm() {
             id: newUserId,
             tenantId: MOCK_TENANT_ID,
             email,
-            role,
+            role: role as User['role'],
             status: 'pending',
             invitedAt: new Date().toISOString(),
             displayName: 'Invited User'
