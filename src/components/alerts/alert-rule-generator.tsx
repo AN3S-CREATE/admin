@@ -13,7 +13,7 @@ import { collection } from 'firebase/firestore';
 import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { Input } from '../ui/input';
 
-const MOCK_TENANT_ID = 'VeraMine'; // As defined in use-user.tsx
+const MOCK_TENANT_ID = 'Veralogix'; // As defined in use-user.tsx
 
 export function AlertRuleGenerator() {
   const [description, setDescription] = useState('Alert if plant pressure exceeds 150 PSI for more than 5 minutes.');

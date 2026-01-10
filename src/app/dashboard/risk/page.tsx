@@ -6,7 +6,7 @@ import { IncidentList } from '@/components/risk/incident-list';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
 
-const MOCK_TENANT_ID = 'VeraMine'; // As defined in use-user.tsx
+const MOCK_TENANT_ID = 'Veralogix'; // As defined in use-user.tsx
 
 export default function RiskPage() {
   const firestore = useFirestore();

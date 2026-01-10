@@ -3,9 +3,9 @@
 /**
  * @fileOverview A conversational flow for the Ops Copilot.
  *
- * - opsCopilotFlow - A function that handles the conversational chat.
- * - OpsCopilotInput - The input type for the opsCopilotFlow function.
- * - OpsCopilotOutput - The return type for the opsCopilotFlow function.
+ * - opsCopilot - A function that handles the conversational chat.
+ * - OpsCopilotInput - The input type for the opsCopilot function.
+ * - OpsCopilotOutput - The return type for the opsCopilot function.
  */
 
 import {ai} from '@/ai/genkit';
@@ -34,7 +34,7 @@ const prompt = ai.definePrompt({
   system: `You are an expert AI assistant for mining operations called Ops Copilot. 
   Your goal is to provide helpful and accurate information to the user.
   
-  You have access to tools that can retrieve live data from the operation's database, including incidents and the vehicle fleet.
+  You have access to tools that can retrieve live data from the operation\'s database, including incidents and the vehicle fleet.
   When a user asks a question that requires information about incidents, events, vehicles, or other operational data,
   you MUST use the available tools to fetch that information.
 

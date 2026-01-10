@@ -18,23 +18,12 @@ export type RepositoryFile = {
   entries: RepositoryEntry[];
 };
 
-export type RepoActivityEntry = {
-  path: string;
-  message: string;
-  relativeTime: string;
-};
-
 export type MessageProcessingOptions = {
   groupBy?: 'topic' | 'date';
   defaultTopic?: string;
   defaultDate?: string;
   fileNamePrefix?: string;
   tableOfContentsThreshold?: number;
-};
-
-export type RepoActivityOptions = {
-  fileName?: string;
-  heading?: string;
 };
 
 const DEFAULT_OPTIONS: Required<MessageProcessingOptions> = {
@@ -51,7 +40,6 @@ const SYSTEM_PROMPT_PATTERNS = [
   /system prompt/i,
   /please help me with/i,
   /you are an expert/i,
-  /how we built it/i,
 ];
 
 const GREETING_PATTERNS = [
@@ -79,12 +67,6 @@ const cleanContent = (content: string): string => {
   const filtered = lines.filter(line => !SYSTEM_PROMPT_PATTERNS.some(pattern => pattern.test(line)));
   return filtered.join('\n').trim();
 };
-
-const stripFiller = (content: string): string =>
-  content
-    .replace(/\b(i am going to be fired|i needed|i need|now|please)\b/gi, '')
-    .replace(/\s+/g, ' ')
-    .trim();
 
 const containsTechnicalContent = (content: string): boolean =>
   TECHNICAL_PATTERNS.some(pattern => pattern.test(content));
@@ -144,64 +126,6 @@ const formatEntry = (entry: RepositoryEntry, index: number): string => {
     '',
     `**Response**: ${entry.response}`,
   ].join('\n');
-};
-
-const formatActivityEntry = (entry: RepoActivityEntry): string =>
-  `- \\`${entry.path}\\`: ${entry.message} (_${entry.relativeTime}_)`;
-
-export const prepareRepoActivityLog = (
-  raw: string,
-  options: RepoActivityOptions = {}
-): RepositoryFile => {
-  const fileName = options.fileName ?? 'repo-activity.md';
-  const heading = options.heading ?? 'Repository Activity';
-  const lines = raw
-    .split('\n')
-    .map(line => line.trim())
-    .filter(Boolean);
-
-  const entries: RepoActivityEntry[] = [];
-  for (let index = 0; index < lines.length; index += 3) {
-    const path = lines[index];
-    const message = lines[index + 1];
-    const relativeTime = lines[index + 2];
-
-    if (!path || !message || !relativeTime) {
-      continue;
-    }
-
-    const cleanedMessage = stripFiller(cleanContent(message));
-    if (!cleanedMessage) {
-      continue;
-    }
-
-    entries.push({
-      path,
-      message: cleanedMessage,
-      relativeTime,
-    });
-  }
-
-  const content = [
-    `## ${heading}`,
-    '',
-    ...entries.map(formatActivityEntry),
-  ]
-    .filter(Boolean)
-    .join('\n')
-    .trim()
-    .concat('\n');
-
-  return {
-    fileName,
-    content,
-    entries: entries.map(entry => ({
-      topic: entry.path,
-      date: entry.relativeTime,
-      query: entry.path,
-      response: entry.message,
-    })),
-  };
 };
 
 export const prepareMessagesForRepository = (

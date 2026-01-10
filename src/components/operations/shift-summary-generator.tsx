@@ -10,7 +10,7 @@ import { useFirestore, useUser } from '@/firebase';
 import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { collection } from 'firebase/firestore';
 
-const MOCK_TENANT_ID = 'VeraMine';
+const MOCK_TENANT_ID = 'Veralogix';
 const MOCK_SITE_ID = 'SiteA';
 
 export function ShiftSummaryGenerator() {

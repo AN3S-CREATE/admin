@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection, query, where } from 'firebase/firestore';
 
-const MOCK_TENANT_ID = 'VeraMine';
+const MOCK_TENANT_ID = 'Veralogix';
 
 export type ActiveAlert = {
     id: string;

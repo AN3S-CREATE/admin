@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { HardHat, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/firebase';
 import { useUser } from '@/firebase/auth/use-user';
 import { signInWithEmailAndPassword, signInAnonymously } from 'firebase/auth';
@@ -17,7 +18,7 @@ export function LoginForm() {
   const router = useRouter();
   const auth = useAuth();
   const { toast } = useToast();
-  const [email, setEmail] = useState('demo@veramine.com');
+  const [email, setEmail] = useState('demo@veralogix.com');
   const [password, setPassword] = useState('password');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const { user, isUserLoading } = useUser();
@@ -69,11 +70,15 @@ export function LoginForm() {
 
   return (
     <Card className="w-full max-w-md glass-card">
-      <CardHeader className="text-center">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-          <HardHat className="h-8 w-8 text-primary" />
-        </div>
-        <CardTitle className="font-headline text-3xl">VeraMine Hub</CardTitle>
+      <CardHeader className="text-center space-y-4">
+        <Image 
+          src="/veralogix-logo.png"
+          alt="Veralogix Logo"
+          width={300}
+          height={67}
+          className="mx-auto"
+          priority
+        />
         <CardDescription>Central nervous system for your mining operations.</CardDescription>
       </CardHeader>
       <form onSubmit={handleLogin}>

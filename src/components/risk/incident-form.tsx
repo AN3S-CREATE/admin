@@ -14,7 +14,7 @@ import { collection } from 'firebase/firestore';
 import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import type { Incident } from '@/types/incident';
 
-const MOCK_TENANT_ID = 'VeraMine'; // As defined in use-user.tsx
+const MOCK_TENANT_ID = 'Veralogix'; // As defined in use-user.tsx
 
 export function IncidentForm() {
   const [title, setTitle] = useState('');

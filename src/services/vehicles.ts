@@ -4,7 +4,7 @@ import { getFirestore, collection, query, where, getDocs, limit, orderBy, QueryC
 import { initializeFirebase } from '@/firebase';
 import type { Vehicle } from '@/types/transport';
 
-const MOCK_TENANT_ID = 'VeraMine';
+const MOCK_TENANT_ID = 'Veralogix';
 
 /**
  * Fetches vehicles from Firestore.

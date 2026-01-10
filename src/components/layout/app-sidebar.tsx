@@ -1,8 +1,9 @@
 "use client";
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { HardHat, LayoutDashboard, Truck, Factory, ClipboardList, ShieldAlert, Users, FileText, MapPin, Plug, Settings, Bell } from 'lucide-react';
+import { LayoutDashboard, Truck, Factory, ClipboardList, ShieldAlert, Users, FileText, MapPin, Plug, Settings, Bell } from 'lucide-react';
 import {
   Sidebar,
   SidebarHeader,
@@ -13,7 +14,7 @@ import {
   SidebarFooter,
 } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+
 
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -38,16 +39,25 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r border-primary/10 bg-card/60">
       <SidebarHeader className="p-4">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-            <HardHat className="h-6 w-6 text-primary" />
-          </div>
-          <span className={cn(
-            "font-headline text-2xl font-bold text-primary",
-            "group-data-[collapsible=icon]:hidden"
-          )}>
-            VeraMine
-          </span>
+        <Link href="/dashboard" className="flex items-center justify-center gap-2">
+           <Image
+              src="/veralogix-logo.png"
+              width={160}
+              height={35}
+              alt="Veralogix Logo"
+              className={cn(
+                "group-data-[collapsible=icon]:hidden"
+              )}
+            />
+             <Image
+              src="/veralogix-logo.png"
+              width={32}
+              height={32}
+              alt="Veralogix Logo Icon"
+              className={cn(
+                "hidden group-data-[collapsible=icon]:block rounded-full"
+              )}
+            />
         </Link>
       </SidebarHeader>
       <SidebarContent className="p-2">

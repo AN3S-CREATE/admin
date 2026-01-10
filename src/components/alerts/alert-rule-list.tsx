@@ -39,7 +39,7 @@ type AlertRuleListProps = {
   isLoading: boolean;
 };
 
-const MOCK_TENANT_ID = 'VeraMine';
+const MOCK_TENANT_ID = 'Veralogix';
 
 export function AlertRuleList({ alertRules, isLoading }: AlertRuleListProps) {
     const firestore = useFirestore();
