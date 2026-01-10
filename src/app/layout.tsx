@@ -4,7 +4,7 @@ import { AppProvider } from '@/app/app-provider';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'VeraMine Smart Hub',
+  title: 'Veralogix Smart Mining',
   description: 'The central nervous system for your mining operations.',
 };
 

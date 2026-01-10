@@ -17,12 +17,12 @@ export const getIncidentsTool = ai.defineTool(
       limit: z.number().optional().default(5).describe('The maximum number of incidents to return.'),
     }),
     outputSchema: z.array(z.object({
-        id: z.string(),
-        title: z.string(),
-        description: z.string(),
-        classification: z.string(),
-        date: z.string(),
-        status: z.string(),
+        id: z.string().optional(),
+        title: z.string().optional(),
+        description: z.string().optional(),
+        classification: z.string().optional(),
+        date: z.string().optional(),
+        status: z.string().optional(),
     })),
   },
   async (input) => {
@@ -42,13 +42,13 @@ export const getVehiclesTool = ai.defineTool(
       limit: z.number().optional().default(10).describe('The maximum number of vehicles to return.'),
     }),
     outputSchema: z.array(z.object({
-        id: z.string(),
-        type: z.string(),
-        status: z.string(),
+        id: z.string().optional(),
+        type: z.string().optional(),
+        status: z.string().optional(),
         driver: z.object({
             id: z.string(),
             name: z.string(),
-        })
+        }).optional()
     })),
   },
   async (input) => {

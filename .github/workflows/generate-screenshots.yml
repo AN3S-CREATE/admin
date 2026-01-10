@@ -1,0 +1,63 @@
+name: Generate Screenshots
+
+on:
+  workflow_dispatch:
+
+jobs:
+  generate-screenshots:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Build Next.js
+        run: npm run build
+
+      - name: Start Next.js
+        run: npm start &
+
+      - name: Wait for localhost:3000
+        run: npx wait-on tcp:3000
+
+      - name: Generate Screenshots
+        run: npx tsx scripts/generate-screenshots.ts
+
+      - name: Organize Files into Role Folders for ZIP
+        run: |
+          cd public/screenshots
+          # Move files like admin_overview.png -> admin/overview.png
+          for file in *.png; do
+             # Skip if no underscore (shouldn't happen with current script but good practice)
+             if [[ "$file" != *"_"* ]]; then continue; fi
+
+             role="${file%%_*}"
+             rest="${file#*_}"
+
+             mkdir -p "$role"
+             mv "$file" "$role/$rest"
+          done
+          cd ../..
+
+      - name: Zip Screenshots
+        run: |
+          cd public/screenshots
+          zip -r ../../hub-screenshots.zip . -x "manifest.json"
+          cd ../..
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hub-screenshots
+          path: hub-screenshots.zip
